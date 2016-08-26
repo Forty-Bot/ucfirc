@@ -24,19 +24,20 @@ public abstract class Main {
     static final Properties properties;
     static final int port;
 
-    static{
-        
-        //try{for(String line= logging.readLine(); line!=null; line= logging.readLine()) System.out.println(line);}catch(IOException e){System.out.println("IOException: "+e.getMessage());}
-	new DOMConfigurator().doConfigure(new java.io.BufferedReader(new java.io.InputStreamReader(Main.class.getResourceAsStream("logging-config.xml"))), LogManager.getLoggerRepository());  //initializes the logger
-        
-        properties = new Properties();
-        try {
-            properties.load(Main.class.getResourceAsStream("ucfirc.properties"));
-            port= Integer.parseInt(properties.getProperty("serverPort"));
-        } catch (IOException e) {
-            logger.fatal("Unable to open properties file");
-            throw(new Error("Unable to open properties file"));
-        }
+    static {
+	
+		//initializes the logger
+		new DOMConfigurator().doConfigure(new java.io.BufferedReader(new java.io.InputStreamReader(
+			Main.class.getResourceAsStream("logging-config.xml"))), LogManager.getLoggerRepository());        
+	
+		properties = new Properties();
+	try {
+	    properties.load(Main.class.getResourceAsStream("ucfirc.properties"));
+	    port = Integer.parseInt(properties.getProperty("serverPort"));
+	} catch (IOException e) {
+	    logger.fatal("Unable to open properties file");
+	    throw(new Error("Unable to open properties file"));
+	}
 
     }
 
@@ -46,7 +47,7 @@ public abstract class Main {
      */
     public static void main(String[] args) {
 
-        logger.info(Common.SALT);
+	logger.info(Common.SALT);
 		ArrayList<Module> handlers= new ArrayList<Module>();
 		UcfMessageHandler messageHandler= new UcfMessageHandler();
 		UcfBot bot= new UcfBot(properties, handlers, messageHandler);
@@ -55,23 +56,23 @@ public abstract class Main {
 		handlers.add(inc);
 		handlers.add(link);
 		bot.setModules(handlers);  //This might not be necessary
-        bot.chatReconnect();
+	bot.chatReconnect();
 
-        Timer timer= new Timer();
-        timer.scheduleAtFixedRate(messageHandler, 0, 1000);
+	Timer timer= new Timer();
+	timer.scheduleAtFixedRate(messageHandler, 0, 1000);
 
-        UcfServer handler= new UcfServer(bot);
+	UcfServer handler= new UcfServer(bot);
 
-        try {
-            HttpServer server = HttpServer.create(new InetSocketAddress(port), 2);
-            logger.info("Opened a new server on port "+port);
-            server.createContext("/", handler);
-            server.start();
-            logger.info("Server successfully started!");
-        } catch (IOException e) {
-            logger.fatal("Unable to open an httpserver on port 4000");
-            throw new Error("Unable to open an httpserver on port 4000", e);
-        }
+	try {
+	    HttpServer server = HttpServer.create(new InetSocketAddress(port), 2);
+	    logger.info("Opened a new server on port "+port);
+	    server.createContext("/", handler);
+	    server.start();
+	    logger.info("Server successfully started!");
+	} catch (IOException e) {
+	    logger.fatal("Unable to open an httpserver on port 4000");
+	    throw new Error("Unable to open an httpserver on port 4000", e);
+	}
 
     }
 

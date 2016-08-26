@@ -76,9 +76,9 @@ public abstract class Common {
      */
     public static boolean hasString(String[] array, String string){
 
-        for(String stringA:array) if(stringA.equals(string)) return true;
-        return false;
-        
+	for(String stringA:array) if(stringA.equals(string)) return true;
+	return false;
+	
 
     }
 
@@ -89,11 +89,11 @@ public abstract class Common {
      */
     public static String toHex(byte[] bytes){
 
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes){
-            sb.append(String.format("%02x", 0xFF & b));
-        }
-        return sb.toString();
+	StringBuilder sb = new StringBuilder(bytes.length * 2);
+	for (byte b : bytes){
+	    sb.append(String.format("%02x", 0xFF & b));
+	}
+	return sb.toString();
 
     }
 
@@ -103,36 +103,36 @@ public abstract class Common {
      */
     public static MessageDigest getMessageDigest(){
 
-        if(pdigest==null){
+	if(pdigest==null){
 
-            try {
-                pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
-                return pdigest;
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.fatal("FATAL ERROR: Unable to load the algorithm \"SHA-1\"");
-                throw new Error("Unable to load the algorithm \"sha-1\"", e);
-            }
+	    try {
+		pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
+		return pdigest;
+	    } catch (NoSuchAlgorithmException e) {
+		LOGGER.fatal("FATAL ERROR: Unable to load the algorithm \"SHA-1\"");
+		throw new Error("Unable to load the algorithm \"sha-1\"", e);
+	    }
 
-        }
-        else{
+	}
+	else{
 
-            MessageDigest digest;
-            try{
+	    MessageDigest digest;
+	    try{
 
-                digest = (MessageDigest) pdigest.clone();
-                pdigest.reset();
-                return digest;
+		digest = (MessageDigest) pdigest.clone();
+		pdigest.reset();
+		return digest;
 
-            }
-            catch(CloneNotSupportedException e){
+	    }
+	    catch(CloneNotSupportedException e){
 
-                LOGGER.fatal("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");  //Won't happen
-                throw new Error("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");
+		LOGGER.fatal("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");  //Won't happen
+		throw new Error("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");
 
-            }
+	    }
 
-        }
-        
+	}
+	
 
     }
 
@@ -143,34 +143,34 @@ public abstract class Common {
      */
     public static String getHash(LinkedList<String> lines){
 
-        MessageDigest digest= getMessageDigest();  //Fetch us a digest
-        PrintStream out;
-        //try {
-        //    out = new PrintStream(new DigestOutputStream(new FileOutputStream("/dev/null"), digest));
-        //} catch (FileNotFoundException ex) {
-        //    LOGGER.error("/dev/null not found: try on a unix system");
-        //   return null;
-        //}
-        out = new PrintStream(new DigestOutputStream(new OutputStream() {
+	MessageDigest digest= getMessageDigest();  //Fetch us a digest
+	PrintStream out;
+	//try {
+	//    out = new PrintStream(new DigestOutputStream(new FileOutputStream("/dev/null"), digest));
+	//} catch (FileNotFoundException ex) {
+	//    LOGGER.error("/dev/null not found: try on a unix system");
+	//   return null;
+	//}
+	out = new PrintStream(new DigestOutputStream(new OutputStream() {
 
-                @Override
-                public void write(int b) {}
-                @Override
-                public void write(byte[] b) {}
-                @Override
-                public void write(byte[] b, int off, int len) {}
+		@Override
+		public void write(int b) {}
+		@Override
+		public void write(byte[] b) {}
+		@Override
+		public void write(byte[] b, int off, int len) {}
 
 
-         }, digest));
-        
+	 }, digest));
+	
 
-        for(String line: lines){
+	for(String line: lines){
 
-            out.println(line);
+	    out.println(line);
 
-        }
+	}
 
-        return toHex(digest.digest());
+	return toHex(digest.digest());
 
     }
 
@@ -198,57 +198,57 @@ public abstract class Common {
     public static String escape(String string){
 
 	if (string == null || string.length() == 0) {
-            return "";
-        }
+	    return "";
+	}
 
-        char b;
-        char c = 0;
-        String hhhh;
-        int i;
-        int len = string.length();
-        StringBuilder sb = new StringBuilder(len + 4);
+	char b;
+	char c = 0;
+	String hhhh;
+	int i;
+	int len = string.length();
+	StringBuilder sb = new StringBuilder(len + 4);
 
-        for (i = 0; i < len; i += 1) {
-            b = c;
-            c = string.charAt(i);
-            switch (c) {
-            case '\\':
-            case '"':
-                sb.append('\\');
-                sb.append(c);
-                break;
-            case '/':
-                if (b == '<') {
-                    sb.append('\\');
-                }
-                sb.append(c);
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
-                               (c >= '\u2000' && c < '\u2100')) {
-                    hhhh = "000" + Integer.toHexString(c);
-                    sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
-                } else {
-                    sb.append(c);
-                }
-            }
-        }
-        return sb.toString();
+	for (i = 0; i < len; i += 1) {
+	    b = c;
+	    c = string.charAt(i);
+	    switch (c) {
+	    case '\\':
+	    case '"':
+		sb.append('\\');
+		sb.append(c);
+		break;
+	    case '/':
+		if (b == '<') {
+		    sb.append('\\');
+		}
+		sb.append(c);
+		break;
+	    case '\b':
+		sb.append("\\b");
+		break;
+	    case '\t':
+		sb.append("\\t");
+		break;
+	    case '\n':
+		sb.append("\\n");
+		break;
+	    case '\f':
+		sb.append("\\f");
+		break;
+	    case '\r':
+		sb.append("\\r");
+		break;
+	    default:
+		if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
+			       (c >= '\u2000' && c < '\u2100')) {
+		    hhhh = "000" + Integer.toHexString(c);
+		    sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
+		} else {
+		    sb.append(c);
+		}
+	    }
+	}
+	return sb.toString();
 
 
     }

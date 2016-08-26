@@ -33,8 +33,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public UcfMessageHandler(){
 
-        queue= new LinkedList<String>();
-        lock= new Object();
+	queue= new LinkedList<String>();
+	lock= new Object();
 
     }
 
@@ -45,10 +45,10 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleError(String error){
 
-        String user= "admin";
-        String message= error;
-        int type= Common.ERROR;
-        addMessage(user, message, type);
+	String user= "admin";
+	String message= error;
+	int type= Common.ERROR;
+	addMessage(user, message, type);
 
     }
 
@@ -60,8 +60,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleSay(String user, String message){
 
-        int type= Common.SAY;
-        addMessage(user, message, type);
+	int type= Common.SAY;
+	addMessage(user, message, type);
 
     }
 
@@ -73,8 +73,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleChannel(String user, String message){
 
-        int type= Common.CHANNEL;
-        addMessage(user, message, type);
+	int type= Common.CHANNEL;
+	addMessage(user, message, type);
 
     }
 
@@ -86,8 +86,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleAction(String user, String message){
 
-        int type= Common.ACTION;
-        addMessage(user, message, type);
+	int type= Common.ACTION;
+	addMessage(user, message, type);
 
     }
 
@@ -99,28 +99,28 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     private void addMessage(String user, String message, int type){
 
-        long time= System.currentTimeMillis();
-        JSONObject object= new JSONObject();
+	long time= System.currentTimeMillis();
+	JSONObject object= new JSONObject();
 
-        try{
+	try{
 
-            object.put("time", time);
-            object.put("user", Common.escape(user));
-            object.put("message", Common.escape(message));
-            object.put("type", type);
+	    object.put("time", time);
+	    object.put("user", Common.escape(user));
+	    object.put("message", Common.escape(message));
+	    object.put("type", type);
 
-            synchronized(lock){
-                queue.add(object.toString());
-            }
-            logger.trace("Added the message \""+object.toString()+"\" to the queue");
+	    synchronized(lock){
+		queue.add(object.toString());
+	    }
+	    logger.trace("Added the message \""+object.toString()+"\" to the queue");
 
-        }
-        catch(JSONException e){
+	}
+	catch(JSONException e){
 
-            logger.warn("Unable to format the message into JSON: "+e.getMessage());
-            return;
+	    logger.warn("Unable to format the message into JSON: "+e.getMessage());
+	    return;
 
-        }
+	}
 
     }
 
@@ -129,95 +129,95 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     private void flush(){
 
-        if(queue.isEmpty()) return;  //Don't even bother if the queue is empty
-        logger.debug("Flushing messages");
-        synchronized (lock){  //Make sure no one else touches the queue while we're using it
+	if(queue.isEmpty()) return;  //Don't even bother if the queue is empty
+	logger.debug("Flushing messages");
+	synchronized (lock){  //Make sure no one else touches the queue while we're using it
 
-            String messageDigest= Common.getHash(queue);  //Get digest in hex
-            String random= Common.randomString();
-            String key= random+Common.SALT+messageDigest;
-            String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));  //Compute the digest to send
-            HttpURLConnection connection;
+	    String messageDigest= Common.getHash(queue);  //Get digest in hex
+	    String random= Common.randomString();
+	    String key= random+Common.SALT+messageDigest;
+	    String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));  //Compute the digest to send
+	    HttpURLConnection connection;
 
-            try{
+	    try{
 
-                URL url= new URL("http://api.casiocalc.org/CasioIRCEventReceiver.php?AuthChallengeRandom="+random+"&AuthChallengeKey="+outDigest);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setRequestMethod("POST");
+		URL url= new URL("http://api.casiocalc.org/CasioIRCEventReceiver.php?AuthChallengeRandom="+random+"&AuthChallengeKey="+outDigest);
+		connection = (HttpURLConnection) url.openConnection();
+		connection.setDoOutput(true);
+		connection.setDoInput(true);
+		connection.setRequestMethod("POST");
 
-                PrintStream out= new PrintStream(connection.getOutputStream());
-                for (String line : queue) {
+		PrintStream out= new PrintStream(connection.getOutputStream());
+		for (String line : queue) {
 
-                    out.println(line);
+		    out.println(line);
 
-                }
-                out.close();
-            }
-            catch(MalformedURLException e){
+		}
+		out.close();
+	    }
+	    catch(MalformedURLException e){
 
-                log("Malformed URL: "+e.getMessage());
-                return;
+		log("Malformed URL: "+e.getMessage());
+		return;
 
-            }
-            catch(ProtocolException e){
+	    }
+	    catch(ProtocolException e){
 
-                log("Error in Protocol: "+e.getMessage());
-                return;
+		log("Error in Protocol: "+e.getMessage());
+		return;
 
-            }
-            catch(IOException e){
+	    }
+	    catch(IOException e){
 
-                log("I/O Error: "+e.getMessage());
-                return;
+		log("I/O Error: "+e.getMessage());
+		return;
 
-            }
+	    }
 
-            try{
+	    try{
 
-                BufferedReader in= new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                for(String line= in.readLine(); line!=null; line= in.readLine()){
+		BufferedReader in= new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		for(String line= in.readLine(); line!=null; line= in.readLine()){
 
-                    logger.trace("RESP: "+line);
+		    logger.trace("RESP: "+line);
 
-                }
+		}
 
-                switch(connection.getResponseCode()){
+		switch(connection.getResponseCode()){
 
-                    case HttpURLConnection.HTTP_OK: break;
-                    case HttpURLConnection.HTTP_BAD_REQUEST: log("Malformed data"); return;
-                    case HttpURLConnection.HTTP_UNAUTHORIZED: log("Unable to authenticate"); return;
+		    case HttpURLConnection.HTTP_OK: break;
+		    case HttpURLConnection.HTTP_BAD_REQUEST: log("Malformed data"); return;
+		    case HttpURLConnection.HTTP_UNAUTHORIZED: log("Unable to authenticate"); return;
 
-                }
+		}
 
-                queue.clear();
+		queue.clear();
 
-            }
-            catch(MalformedURLException e){
+	    }
+	    catch(MalformedURLException e){
 
-                log("Malformed URL: "+e.getMessage());
+		log("Malformed URL: "+e.getMessage());
 
-            }
-            catch(ProtocolException e){
+	    }
+	    catch(ProtocolException e){
 
-                log("Error in Protocol: "+e.getMessage());
+		log("Error in Protocol: "+e.getMessage());
 
-            }
-            catch(IOException e){
+	    }
+	    catch(IOException e){
 
-                log("I/O Error: "+e.getMessage());
+		log("I/O Error: "+e.getMessage());
 
-            }
+	    }
 
-        }
+	}
 
     }
 
     @Override
     public void run(){
 
-        flush();
+	flush();
 
     }
 
@@ -227,14 +227,14 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     private void log(String error){
 
-        logger.error("Unable to send data to casiocalc.org: "+error);
+	logger.error("Unable to send data to casiocalc.org: "+error);
 
     }
 
     @Override
     public void finalize() throws Throwable{
 
-        super.finalize();
+	super.finalize();
 
     }
 

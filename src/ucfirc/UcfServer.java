@@ -31,76 +31,76 @@ public class UcfServer implements HttpHandler{
      */
     public UcfServer(UcfBot bot){
 
-        this.bot= bot;
+	this.bot= bot;
 
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        logger.trace("Recieved request from "+exchange.getRemoteAddress().getHostName());
+	logger.trace("Recieved request from "+exchange.getRemoteAddress().getHostName());
 
-        if(!(exchange.getRequestMethod().equals("POST"))){  //If the request was not post, return an error
+	if(!(exchange.getRequestMethod().equals("POST"))){  //If the request was not post, return an error
 
-            sendError(exchange, "Bad method: "+exchange.getRequestMethod(), HttpURLConnection.HTTP_BAD_METHOD);
-            return;
+	    sendError(exchange, "Bad method: "+exchange.getRequestMethod(), HttpURLConnection.HTTP_BAD_METHOD);
+	    return;
 
-        }
+	}
 
-        BufferedReader body= new BufferedReader(new InputStreamReader(exchange.getRequestBody()));  //Create a new buferedreader that updates the MessageDigest
+	BufferedReader body= new BufferedReader(new InputStreamReader(exchange.getRequestBody()));  //Create a new buferedreader that updates the MessageDigest
 
-        LinkedList<String> buffer= new LinkedList<String>();  //Read the lines into a buffer
-        for(String line= body.readLine(); line!=null; line= body.readLine()) {
+	LinkedList<String> buffer= new LinkedList<String>();  //Read the lines into a buffer
+	for(String line= body.readLine(); line!=null; line= body.readLine()) {
 
-            buffer.add(line);
-            logger.trace("RECV: "+line);
+	    buffer.add(line);
+	    logger.trace("RECV: "+line);
 
-        }
+	}
 
-        Headers headers= exchange.getRequestHeaders();  //Get the headers
-        String random= headers.getFirst("AuthChallengeRandom");
-        String inDigest= headers.getFirst("AuthChallengeKey");
+	Headers headers= exchange.getRequestHeaders();  //Get the headers
+	String random= headers.getFirst("AuthChallengeRandom");
+	String inDigest= headers.getFirst("AuthChallengeKey");
 
-        String messageDigest= Common.getHash(buffer);  //Compute our message digest
-        String key= random+Common.SALT+messageDigest;
-        String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));
-        
+	String messageDigest= Common.getHash(buffer);  //Compute our message digest
+	String key= random+Common.SALT+messageDigest;
+	String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));
+	
 
-        logger.trace("Input Digest: "+inDigest+" Random: "+random+" Message Digest: "+messageDigest+" Computed Digest: "+outDigest);
+	logger.trace("Input Digest: "+inDigest+" Random: "+random+" Message Digest: "+messageDigest+" Computed Digest: "+outDigest);
 
-        if(!(outDigest.equals(inDigest))){  //If they're not equal, complain
+	if(!(outDigest.equals(inDigest))){  //If they're not equal, complain
 
-            sendError(exchange, "Invalid digest: "+inDigest, HttpURLConnection.HTTP_UNAUTHORIZED);
-            return;
+	    sendError(exchange, "Invalid digest: "+inDigest, HttpURLConnection.HTTP_UNAUTHORIZED);
+	    return;
 
-        }
+	}
 
-        for(String line: buffer){  //Parse each line from the server
+	for(String line: buffer){  //Parse each line from the server
 
-            try {
+	    try {
 
-                JSONObject json = new JSONObject(line);  //Create a new object for each line
+		JSONObject json = new JSONObject(line);  //Create a new object for each line
 
-                String user= json.getString("user");  //Init vars
-                String message= json.getString("message");
-                int type= json.getInt("type");
+		String user= json.getString("user");  //Init vars
+		String message= json.getString("message");
+		int type= json.getInt("type");
 
-                switch(type){  //Switch for message types
-                    case 0: bot.error(message); break;
-                    case 1: bot.say(user, message); break;
-                    case 2: bot.channel(user, message); break;
-                    case 3: bot.action(user, message); break;
-                    default: logger.debug("Invalid message type: "+type); break;
-                }
+		switch(type){  //Switch for message types
+		    case 0: bot.error(message); break;
+		    case 1: bot.say(user, message); break;
+		    case 2: bot.channel(user, message); break;
+		    case 3: bot.action(user, message); break;
+		    default: logger.debug("Invalid message type: "+type); break;
+		}
 
-            } catch (JSONException e) {
-                logger.debug("Unable to parse line from server: "+line);
-            }
+	    } catch (JSONException e) {
+		logger.debug("Unable to parse line from server: "+line);
+	    }
 
-        }
+	}
 
-        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);  //Wrap it up
-        exchange.close();
+	exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);  //Wrap it up
+	exchange.close();
 
     }
 
@@ -113,10 +113,10 @@ public class UcfServer implements HttpHandler{
      */
     private void sendError(HttpExchange exchange, java.lang.String error, int errorCode) throws IOException {
 
-        logger.debug("Illegal request from "+exchange.getRemoteAddress().getHostName()+": "+error);
-        exchange.sendResponseHeaders(errorCode, 0);
-        exchange.close();
-        return;
+	logger.debug("Illegal request from "+exchange.getRemoteAddress().getHostName()+": "+error);
+	exchange.sendResponseHeaders(errorCode, 0);
+	exchange.close();
+	return;
 
 
     }
@@ -124,7 +124,7 @@ public class UcfServer implements HttpHandler{
     @Override
     public void finalize() throws Throwable{
 
-        super.finalize();
+	super.finalize();
 
     }
 
