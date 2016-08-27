@@ -14,7 +14,7 @@ public class Module implements MessageHandler{
     /**
      * Forward incoming messages (from server)
      */
-    public static final boolean forwardIncoming= false;
+    public static final boolean forwardIncoming = false;
 
     UcfBot bot;
 
@@ -24,7 +24,7 @@ public class Module implements MessageHandler{
      */
     protected Module(UcfBot bot){
 
-	this.bot= bot;
+	this.bot = bot;
 
     }
 

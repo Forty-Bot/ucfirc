@@ -6,7 +6,7 @@ package ucfirc;
  */
 public interface MessageHandler {
 
-    boolean forwardIncoming= false;
+    boolean forwardIncoming = false;
 
     /**
      * Handles an error

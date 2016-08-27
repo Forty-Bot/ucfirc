@@ -22,7 +22,7 @@ import java.util.LinkedList;
  */
 public class UcfServer implements HttpHandler{
 
-    static final Logger logger= Logger.getLogger(UcfServer.class.getCanonicalName());
+    static final Logger logger = Logger.getLogger(UcfServer.class.getCanonicalName());
     private UcfBot bot;
 
     /**
@@ -31,7 +31,7 @@ public class UcfServer implements HttpHandler{
      */
     public UcfServer(UcfBot bot){
 
-	this.bot= bot;
+	this.bot = bot;
 
     }
 
@@ -47,23 +47,23 @@ public class UcfServer implements HttpHandler{
 
 	}
 
-	BufferedReader body= new BufferedReader(new InputStreamReader(exchange.getRequestBody()));  //Create a new buferedreader that updates the MessageDigest
+	BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));  //Create a new buferedreader that updates the MessageDigest
 
-	LinkedList<String> buffer= new LinkedList<String>();  //Read the lines into a buffer
-	for(String line= body.readLine(); line!=null; line= body.readLine()) {
+	LinkedList<String> buffer = new LinkedList<String>();  //Read the lines into a buffer
+	for(String line = body.readLine(); line! =null; line = body.readLine()) {
 
 	    buffer.add(line);
 	    logger.trace("RECV: "+line);
 
 	}
 
-	Headers headers= exchange.getRequestHeaders();  //Get the headers
-	String random= headers.getFirst("AuthChallengeRandom");
-	String inDigest= headers.getFirst("AuthChallengeKey");
+	Headers headers = exchange.getRequestHeaders();  //Get the headers
+	String random = headers.getFirst("AuthChallengeRandom");
+	String inDigest = headers.getFirst("AuthChallengeKey");
 
-	String messageDigest= Common.getHash(buffer);  //Compute our message digest
-	String key= random+Common.SALT+messageDigest;
-	String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));
+	String messageDigest = Common.getHash(buffer);  //Compute our message digest
+	String key = random+Common.SALT+messageDigest;
+	String outDigest = Common.toHex(Common.getMessageDigest().digest(key.getBytes()));
 	
 
 	logger.trace("Input Digest: "+inDigest+" Random: "+random+" Message Digest: "+messageDigest+" Computed Digest: "+outDigest);
@@ -81,9 +81,9 @@ public class UcfServer implements HttpHandler{
 
 		JSONObject json = new JSONObject(line);  //Create a new object for each line
 
-		String user= json.getString("user");  //Init vars
-		String message= json.getString("message");
-		int type= json.getInt("type");
+		String user = json.getString("user");  //Init vars
+		String message = json.getString("message");
+		int type = json.getInt("type");
 
 		switch(type){  //Switch for message types
 		    case 0: bot.error(message); break;

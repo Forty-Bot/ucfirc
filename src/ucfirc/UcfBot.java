@@ -20,26 +20,26 @@ import java.util.Properties;
  */
 public class UcfBot extends PircBot{
 
-    private boolean reconnect= true;
-    static final Logger logger= Logger.getLogger(UcfBot.class.getCanonicalName());
+    private boolean reconnect = true;
+    static final Logger logger = Logger.getLogger(UcfBot.class.getCanonicalName());
     private ArrayList<Module> modules;
     private MessageHandler messageHandler;
 
     //This is all to play with 2072's mind (and it's also good for 'reducing' code size)
 
-    public static final String[] joins= {
+    public static final String[] joins = {
 
 	"has joined the channel"
 
     };
 
-    public static final String[] parts= {
+    public static final String[] parts = {
 
 	"has left the channel"
 
     };
 
-    public static final String[] changes= {
+    public static final String[] changes = {
 	
 	"has changed his name to"
 
@@ -63,17 +63,17 @@ public class UcfBot extends PircBot{
     public UcfBot(Properties properties, ArrayList<Module> modules, MessageHandler handler) {
 	
 	setName(properties.getProperty("nick"));
-	server= properties.getProperty("server");
-	port= Integer.parseInt(properties.getProperty("port"));
-	password= properties.getProperty("password");
-	talkChannel= properties.getProperty("talkChannel");
-	maxConnectAttempts= Integer.parseInt(properties.getProperty("maxConnectAttempts"));
-	reconnectDelay= Long.parseLong(properties.getProperty("reconnectDelay"));
-	kickDelay= Long.parseLong(properties.getProperty("kickDelay"));
-	version= properties.getProperty("version");
+	server = properties.getProperty("server");
+	port = Integer.parseInt(properties.getProperty("port"));
+	password = properties.getProperty("password");
+	talkChannel = properties.getProperty("talkChannel");
+	maxConnectAttempts = Integer.parseInt(properties.getProperty("maxConnectAttempts"));
+	reconnectDelay = Long.parseLong(properties.getProperty("reconnectDelay"));
+	kickDelay = Long.parseLong(properties.getProperty("kickDelay"));
+	version = properties.getProperty("version");
 
-	this.modules= modules;
-	messageHandler= handler;
+	this.modules = modules;
+	messageHandler = handler;
 
 	setVersion("Ucf Irc Chatbot "+version+" casiocalc.org");
 	setLogin("UcfIrc");
@@ -122,7 +122,7 @@ public class UcfBot extends PircBot{
      */
     private void chatConnect(String hostname, int port, String password) {
 
-	for(int i= 0; i<maxConnectAttempts; i++) {
+	for(int i = 0; i<maxConnectAttempts; i++) {
 	    try{
 
 		connect(hostname, port, password);
@@ -135,7 +135,7 @@ public class UcfBot extends PircBot{
 
 		logger.debug("Someone is already using the nickname "+getNick());
 		if(!(i<maxConnectAttempts-1)) break;  //Don't bother reconecting if we're just gonna exit the loop
-		String newNick= getNick().substring(0, getNick().length()-1)+i;  //Replace the last char in the current nick with the current iteration
+		String newNick = getNick().substring(0, getNick().length()-1)+i;  //Replace the last char in the current nick with the current iteration
 		setName(newNick);
 		logger.debug("Retrying with the nick \""+newNick+"\" in "+reconnectDelay+" ms ["+i+" of "+maxConnectAttempts+"]");
 
@@ -264,7 +264,7 @@ public class UcfBot extends PircBot{
     public void finalize() throws Throwable{
 
 	if(!(isConnected())) return;
-	reconnect= false;
+	reconnect = false;
 	quitServer("Someone pulled the plug!");
 	super.finalize();
 
@@ -290,7 +290,7 @@ public class UcfBot extends PircBot{
 	if(!(channel.equals(talkChannel))) return;
 	if(sender.equals(getName())) return;
 
-	String message= Common.getRandomElement(joins);
+	String message = Common.getRandomElement(joins);
 
 	channelModules(sender, message);
 	messageHandler.handleChannel(sender, message);
@@ -304,7 +304,7 @@ public class UcfBot extends PircBot{
 	if(!(channel.equals(talkChannel))) return;
 	if(sender.equals(getName())) return;
 
-	String message= Common.getRandomElement(parts);
+	String message = Common.getRandomElement(parts);
 
 	channelModules(sender, message);
 	messageHandler.handleChannel(sender, message);
@@ -328,7 +328,7 @@ public class UcfBot extends PircBot{
 
 	if(sourceNick.equals(getName())) return;
 
-	String message= Common.getRandomElement(parts);
+	String message = Common.getRandomElement(parts);
 
 	channelModules(sourceNick, message);
 	messageHandler.handleChannel(sourceNick, message);
@@ -341,7 +341,7 @@ public class UcfBot extends PircBot{
 
 	if(newNick.equals(getName())) return;
 
-	String message= Common.getRandomElement(changes);
+	String message = Common.getRandomElement(changes);
 	logger.fatal(message);
 	
 	channelModules(oldNick, message+" "+newNick);
@@ -357,7 +357,7 @@ public class UcfBot extends PircBot{
      */
     public boolean isIRCUser(String user){
 
-	User[] users= this.getUsers(talkChannel);
+	User[] users = this.getUsers(talkChannel);
 	for(User nick: users) {if(nick.toString().equals(user)) return true;} return false;
 
     }
@@ -370,9 +370,9 @@ public class UcfBot extends PircBot{
     public boolean isMod(String user){
 
 	if(!isIRCUser(user)) return false;
-	User[] users= this.getUsers(talkChannel);
+	User[] users = this.getUsers(talkChannel);
 	int i;
-	for(i=0; i<users.length; i++){
+	for(i =0; i<users.length; i++){
 
 	    if(users[i].toString().equals(user)) break;
 
@@ -399,7 +399,7 @@ public class UcfBot extends PircBot{
      */
     public void setModules(ArrayList<Module> modules){
 
-	this.modules= modules;
+	this.modules = modules;
 
     }
 

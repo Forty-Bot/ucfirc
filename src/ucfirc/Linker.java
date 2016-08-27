@@ -17,11 +17,11 @@ import java.util.Properties;
  */
 public class Linker extends Module{
 
-    static final Logger logger= Logger.getLogger(Linker.class.getCanonicalName());
-    static final String PROPERTY= "link";
-    static final char SEPARATOR= '\u001D';
+    static final Logger logger = Logger.getLogger(Linker.class.getCanonicalName());
+    static final String PROPERTY = "link";
+    static final char SEPARATOR = '\u001D';
     Properties links;
-    boolean forwardIncoming= true;
+    boolean forwardIncoming = true;
 
     /**
      *
@@ -30,7 +30,7 @@ public class Linker extends Module{
     public Linker(UcfBot bot){
 
 	super(bot);
-	links= new Properties();
+	links = new Properties();
 	try {
 	    links.load(Common.getInputStreamFromProperty(PROPERTY));
 	} catch (IOException e) {
@@ -71,18 +71,18 @@ public class Linker extends Module{
      @Override
     public void handleSay(String user, String message) {
 
-	message=message.toLowerCase();
+	message =message.toLowerCase();
 	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
 
-	if(message.charAt(0)==Common.PREFIX){  //It's for me!
+	if(message.charAt(0) = =Common.PREFIX){  //It's for me!
 
-	    String mess= message.substring(1);
+	    String mess = message.substring(1);
 
 	    if(Common.getCommand(mess).equals("link")){
 
 		if(!bot.isMod(user)) return;
-		String keyword= Common.getCommand(Common.getMessage(mess));
-		String response= Common.getMessage(Common.getMessage(mess));
+		String keyword = Common.getCommand(Common.getMessage(mess));
+		String response = Common.getMessage(Common.getMessage(mess));
 		setLink(keyword, response);
 
 	    } else{

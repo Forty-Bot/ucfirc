@@ -24,7 +24,7 @@ import java.util.TimerTask;
  */
 public class UcfMessageHandler extends TimerTask implements MessageHandler{
 
-    static final Logger logger= Logger.getLogger(UcfMessageHandler.class.getCanonicalName());
+    static final Logger logger = Logger.getLogger(UcfMessageHandler.class.getCanonicalName());
     private LinkedList<String> queue;
     private final Object lock;
 
@@ -33,8 +33,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public UcfMessageHandler(){
 
-	queue= new LinkedList<String>();
-	lock= new Object();
+	queue = new LinkedList<String>();
+	lock = new Object();
 
     }
 
@@ -45,9 +45,9 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleError(String error){
 
-	String user= "admin";
-	String message= error;
-	int type= Common.ERROR;
+	String user = "admin";
+	String message = error;
+	int type = Common.ERROR;
 	addMessage(user, message, type);
 
     }
@@ -60,7 +60,7 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleSay(String user, String message){
 
-	int type= Common.SAY;
+	int type = Common.SAY;
 	addMessage(user, message, type);
 
     }
@@ -73,7 +73,7 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleChannel(String user, String message){
 
-	int type= Common.CHANNEL;
+	int type = Common.CHANNEL;
 	addMessage(user, message, type);
 
     }
@@ -86,7 +86,7 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     public void handleAction(String user, String message){
 
-	int type= Common.ACTION;
+	int type = Common.ACTION;
 	addMessage(user, message, type);
 
     }
@@ -99,8 +99,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
      */
     private void addMessage(String user, String message, int type){
 
-	long time= System.currentTimeMillis();
-	JSONObject object= new JSONObject();
+	long time = System.currentTimeMillis();
+	JSONObject object = new JSONObject();
 
 	try{
 
@@ -133,21 +133,21 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
 	logger.debug("Flushing messages");
 	synchronized (lock){  //Make sure no one else touches the queue while we're using it
 
-	    String messageDigest= Common.getHash(queue);  //Get digest in hex
-	    String random= Common.randomString();
-	    String key= random+Common.SALT+messageDigest;
-	    String outDigest= Common.toHex(Common.getMessageDigest().digest(key.getBytes()));  //Compute the digest to send
+	    String messageDigest = Common.getHash(queue);  //Get digest in hex
+	    String random = Common.randomString();
+	    String key = random+Common.SALT+messageDigest;
+	    String outDigest = Common.toHex(Common.getMessageDigest().digest(key.getBytes()));  //Compute the digest to send
 	    HttpURLConnection connection;
 
 	    try{
 
-		URL url= new URL("http://api.casiocalc.org/CasioIRCEventReceiver.php?AuthChallengeRandom="+random+"&AuthChallengeKey="+outDigest);
+		URL url = new URL("http://api.casiocalc.org/CasioIRCEventReceiver.php?AuthChallengeRandom ="+random+"&AuthChallengeKey ="+outDigest);
 		connection = (HttpURLConnection) url.openConnection();
 		connection.setDoOutput(true);
 		connection.setDoInput(true);
 		connection.setRequestMethod("POST");
 
-		PrintStream out= new PrintStream(connection.getOutputStream());
+		PrintStream out = new PrintStream(connection.getOutputStream());
 		for (String line : queue) {
 
 		    out.println(line);
@@ -176,8 +176,8 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler{
 
 	    try{
 
-		BufferedReader in= new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		for(String line= in.readLine(); line!=null; line= in.readLine()){
+		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		for(String line = in.readLine(); line! =null; line = in.readLine()){
 
 		    logger.trace("RESP: "+line);
 

@@ -27,46 +27,46 @@ public abstract class Common {
     /**
      * The salt to be used to authenticate messages
      */
-    public static final String SALT= Main.properties.getProperty("salt");
+    public static final String SALT = Main.properties.getProperty("salt");
     /**
      * The user's home directory
      */
-    public static final String HOME= System.getProperty("user.home");
+    public static final String HOME = System.getProperty("user.home");
     /**
      * Allowed characters in a url
      */
-    public static final String ALLOWED_CHARACTERS= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    public static final String ALLOWED_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     /**
      * The length of ALLOWED_CHARACTERS
      */
-    public static final int ALLOWED_CHARACTERS_LENGTH= ALLOWED_CHARACTERS.length();
+    public static final int ALLOWED_CHARACTERS_LENGTH = ALLOWED_CHARACTERS.length();
     /**
      * Code for an error
      */
-    public static final int ERROR= 0;
+    public static final int ERROR = 0;
     /**
      * Code for a message
      */
-    public static final int SAY= 1;
+    public static final int SAY = 1;
     /**
      * Code for a channel event
      */
-    public static final int CHANNEL= 2;
+    public static final int CHANNEL = 2;
     /**
      * Code for an action
      */
-    public static final int ACTION= 3;
+    public static final int ACTION = 3;
 
-    static final Logger LOGGER= Logger.getLogger(Common.class.getCanonicalName());
-    static final String logDir= Main.properties.getProperty("logdir");
+    static final Logger LOGGER = Logger.getLogger(Common.class.getCanonicalName());
+    static final String logDir = Main.properties.getProperty("logdir");
 
     private static MessageDigest pdigest;
-    private static Random random= new Random(System.nanoTime());
+    private static Random random = new Random(System.nanoTime());
 
     /**
      * The prefix for modules to use
      */
-    static final char PREFIX= Main.properties.getProperty("prefix").charAt(0);
+    static final char PREFIX = Main.properties.getProperty("prefix").charAt(0);
 
     /**
      * Utility method that checks to see if an array has a string.
@@ -103,7 +103,7 @@ public abstract class Common {
      */
     public static MessageDigest getMessageDigest(){
 
-	if(pdigest==null){
+	if(pdigest = =null){
 
 	    try {
 		pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
@@ -143,7 +143,7 @@ public abstract class Common {
      */
     public static String getHash(LinkedList<String> lines){
 
-	MessageDigest digest= getMessageDigest();  //Fetch us a digest
+	MessageDigest digest = getMessageDigest();  //Fetch us a digest
 	PrintStream out;
 	//try {
 	//    out = new PrintStream(new DigestOutputStream(new FileOutputStream("/dev/null"), digest));
@@ -179,11 +179,11 @@ public abstract class Common {
      */
     public static String randomString(){
 
-	StringBuffer randomS= new StringBuffer();
-	for(int i= 0; i<32; i++){
+	StringBuffer randomS = new StringBuffer();
+	for(int i = 0; i<32; i++){
 
-	    int index= random.nextInt(ALLOWED_CHARACTERS_LENGTH);
-	    randomS= randomS.append(ALLOWED_CHARACTERS.charAt(index));
+	    int index = random.nextInt(ALLOWED_CHARACTERS_LENGTH);
+	    randomS = randomS.append(ALLOWED_CHARACTERS.charAt(index));
 
 	}
 	return randomS.toString();
@@ -197,7 +197,7 @@ public abstract class Common {
      */
     public static String escape(String string){
 
-	if (string == null || string.length() == 0) {
+	if (string = = null || string.length() = = 0) {
 	    return "";
 	}
 
@@ -208,7 +208,7 @@ public abstract class Common {
 	int len = string.length();
 	StringBuilder sb = new StringBuilder(len + 4);
 
-	for (i = 0; i < len; i += 1) {
+	for (i = 0; i < len; i + = 1) {
 	    b = c;
 	    c = string.charAt(i);
 	    switch (c) {
@@ -218,7 +218,7 @@ public abstract class Common {
 		sb.append(c);
 		break;
 	    case '/':
-		if (b == '<') {
+		if (b = = '<') {
 		    sb.append('\\');
 		}
 		sb.append(c);
@@ -239,8 +239,8 @@ public abstract class Common {
 		sb.append("\\r");
 		break;
 	    default:
-		if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
-			       (c >= '\u2000' && c < '\u2100')) {
+		if (c < ' ' || (c > = '\u0080' && c < '\u00a0') ||
+			       (c > = '\u2000' && c < '\u2100')) {
 		    hhhh = "000" + Integer.toHexString(c);
 		    sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
 		} else {

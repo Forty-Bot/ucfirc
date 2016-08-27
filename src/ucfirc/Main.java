@@ -51,20 +51,20 @@ public abstract class Main {
     public static void main(String[] args) {
 
 	logger.info(Common.SALT);
-		ArrayList<Module> handlers= new ArrayList<Module>();
-		UcfMessageHandler messageHandler= new UcfMessageHandler();
-		UcfBot bot= new UcfBot(properties, handlers, messageHandler);
-		Incrementer inc= new Incrementer(bot);
-		Linker link= new Linker(bot);
+		ArrayList<Module> handlers = new ArrayList<Module>();
+		UcfMessageHandler messageHandler = new UcfMessageHandler();
+		UcfBot bot = new UcfBot(properties, handlers, messageHandler);
+		Incrementer inc = new Incrementer(bot);
+		Linker link = new Linker(bot);
 		handlers.add(inc);
 		handlers.add(link);
 		bot.setModules(handlers);  //This might not be necessary
 	bot.chatReconnect();
 
-	Timer timer= new Timer();
+	Timer timer = new Timer();
 	timer.scheduleAtFixedRate(messageHandler, 0, 1000);
 
-	UcfServer handler= new UcfServer(bot);
+	UcfServer handler = new UcfServer(bot);
 
 	try {
 	    HttpServer server = HttpServer.create(new InetSocketAddress(port), 2);

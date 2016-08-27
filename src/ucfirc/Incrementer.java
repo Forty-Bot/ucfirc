@@ -22,9 +22,9 @@ public class Incrementer extends Module{
     
     
     Properties increments;
-    static final Logger logger= Logger.getLogger(Incrementer.class.getCanonicalName());
-    static final String PROPERTY= "increment";
-    boolean forwardIncoming= true;
+    static final Logger logger = Logger.getLogger(Incrementer.class.getCanonicalName());
+    static final String PROPERTY = "increment";
+    boolean forwardIncoming = true;
     
     /**
      * Creates a new incrementer
@@ -33,7 +33,7 @@ public class Incrementer extends Module{
     public Incrementer(UcfBot bot){
 	
 	super(bot);
-	increments= new Properties();
+	increments = new Properties();
 	try {
 	    increments.load(Common.getInputStreamFromProperty(PROPERTY));
 	} catch (IOException e) {
@@ -73,12 +73,12 @@ public class Incrementer extends Module{
     @Override
     public void handleSay(String user, String message) {
 
-	message=message.toLowerCase();
+	message =message.toLowerCase();
 	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
 	
-	if(message.charAt(0)==Common.PREFIX){  //It's for me!
+	if(message.charAt(0) = =Common.PREFIX){  //It's for me!
 
-	    String mess= message.substring(1);
+	    String mess = message.substring(1);
 	    System.out.print(mess+" ");
 	    System.out.println(Arrays.toString(mess.split(" ",2)));
 	    if(Common.getCommand(message).equals("karma")){
@@ -92,36 +92,36 @@ public class Incrementer extends Module{
 	
 	//This could be done better with String.substring(), but I already coded it, thus screwing my ability to figure out what this all does in a year's time
 
-	boolean one= false;
-	char[] str= message.toCharArray();
-	ArrayList<Integer> spaces= new ArrayList<Integer>();
+	boolean one = false;
+	char[] str = message.toCharArray();
+	ArrayList<Integer> spaces = new ArrayList<Integer>();
 	spaces.add(0);
 
-	for(int i= 0; i<str.length; i++){
+	for(int i = 0; i<str.length; i++){
 
-	    if(str[i]=='+') {
+	    if(str[i] = ='+') {
 
 		if(one){
 
-		    int space= (int)spaces.get(spaces.size()-1);
-		    char[] string= new char[(i-1)-space];
-		    int k= string.length-1;
-		    for(int j= i-2; j>=space; j--){
+		    int space = (int)spaces.get(spaces.size()-1);
+		    char[] string = new char[(i-1)-space];
+		    int k = string.length-1;
+		    for(int j = i-2; j> =space; j--){
 
-			string[k]= str[j];
+			string[k] = str[j];
 			k--;
 
 		    }
 
 		    increment(new String(string));
 		    
-		} else one= true;
+		} else one = true;
 
-	    } else if(str[i]==' '){
+	    } else if(str[i] = =' '){
 
 		spaces.add(i+1);
 
-	    } else if(one) one= false;
+	    } else if(one) one = false;
 
 	}
 
