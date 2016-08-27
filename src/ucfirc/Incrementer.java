@@ -76,7 +76,7 @@ public class Incrementer extends Module{
 	message =message.toLowerCase();
 	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
 	
-	if(message.charAt(0) = =Common.PREFIX){  //It's for me!
+	if(message.charAt(0) ==Common.PREFIX){  //It's for me!
 
 	    String mess = message.substring(1);
 	    System.out.print(mess+" ");
@@ -99,7 +99,7 @@ public class Incrementer extends Module{
 
 	for(int i = 0; i<str.length; i++){
 
-	    if(str[i] = ='+') {
+	    if(str[i] =='+') {
 
 		if(one){
 
@@ -117,7 +117,7 @@ public class Incrementer extends Module{
 		    
 		} else one = true;
 
-	    } else if(str[i] = =' '){
+	    } else if(str[i] ==' '){
 
 		spaces.add(i+1);
 

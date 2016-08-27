@@ -103,7 +103,7 @@ public abstract class Common {
      */
     public static MessageDigest getMessageDigest(){
 
-	if(pdigest = =null){
+	if(pdigest ==null){
 
 	    try {
 		pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
@@ -197,7 +197,7 @@ public abstract class Common {
      */
     public static String escape(String string){
 
-	if (string = = null || string.length() = = 0) {
+	if (string == null || string.length() == 0) {
 	    return "";
 	}
 
@@ -218,7 +218,7 @@ public abstract class Common {
 		sb.append(c);
 		break;
 	    case '/':
-		if (b = = '<') {
+		if (b == '<') {
 		    sb.append('\\');
 		}
 		sb.append(c);

@@ -74,7 +74,7 @@ public class Linker extends Module{
 	message =message.toLowerCase();
 	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
 
-	if(message.charAt(0) = =Common.PREFIX){  //It's for me!
+	if(message.charAt(0) == Common.PREFIX){  //It's for me!
 
 	    String mess = message.substring(1);
 
