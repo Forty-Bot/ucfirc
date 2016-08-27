@@ -6,6 +6,8 @@ import org.apache.log4j.*;
 import org.apache.log4j.xml.DOMConfigurator;
 
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import java.net.InetSocketAddress;
 
@@ -20,24 +22,25 @@ import java.util.Timer;
  */
 public abstract class Main {
 
-    static final Logger logger= Logger.getLogger(Main.class.getCanonicalName());
+    static final Logger logger = Logger.getLogger(Main.class.getCanonicalName());
     static final Properties properties;
     static final int port;
 
     static {
 	
-		//initializes the logger
-		new DOMConfigurator().doConfigure(new java.io.BufferedReader(new java.io.InputStreamReader(
-			Main.class.getResourceAsStream("logging-config.xml"))), LogManager.getLoggerRepository());        
+		//initialize the logger
+		BufferedReader logging_config = new BufferedReader(new InputStreamReader(
+					Main.class.getResourceAsStream("/logging-config.xml")));
+		new DOMConfigurator().doConfigure(logging_config, LogManager.getLoggerRepository());
 	
 		properties = new Properties();
-	try {
-	    properties.load(Main.class.getResourceAsStream("ucfirc.properties"));
-	    port = Integer.parseInt(properties.getProperty("serverPort"));
-	} catch (IOException e) {
-	    logger.fatal("Unable to open properties file");
-	    throw(new Error("Unable to open properties file"));
-	}
+		try {
+			properties.load(Main.class.getResourceAsStream("/ucfirc.properties"));
+			port = Integer.parseInt(properties.getProperty("serverPort"));
+		} catch (IOException e) {
+			logger.fatal("Unable to open properties file :" + e.getMessage());
+			throw new Error(e);
+		}
 
     }
 
