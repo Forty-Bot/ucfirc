@@ -2,3 +2,8 @@ bin/*
 build/*
 log/*
 tags
+*.swp
+*.swo
+*.gradle
+.lvimrc
+.vimrc
