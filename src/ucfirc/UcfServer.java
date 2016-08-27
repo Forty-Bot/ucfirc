@@ -50,7 +50,7 @@ public class UcfServer implements HttpHandler {
 	BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));  //Create a new buferedreader that updates the MessageDigest
 
 	LinkedList<String> buffer = new LinkedList<String>();  //Read the lines into a buffer
-	for(String line = body.readLine(); line! =null; line = body.readLine()) {
+	for(String line = body.readLine(); line != null; line = body.readLine()) {
 
 	    buffer.add(line);
 	    logger.trace("RECV: " + line);

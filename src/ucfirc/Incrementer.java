@@ -11,11 +11,14 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 
 /**
  * Incrementer module
- * (x + + and such) use !karma &ltkeyword&gt
+ * (x++ and such) use !karma &ltkeyword&gt
  * @author sean
  */
 public class Incrementer extends Module {
@@ -28,7 +31,7 @@ public class Incrementer extends Module {
     
     /**
      * Creates a new incrementer
-     * @param bot The bot to use
+     * @param bot The bot to attatch to
      */
     public Incrementer(UcfBot bot) {
 	
@@ -45,7 +48,7 @@ public class Incrementer extends Module {
 
     /**
      * Increments a string
-     * @param incrementee The string to increment
+     * @param incrementee The keyword to increment
      */
     public void increment(String incrementee) {
 
@@ -60,9 +63,9 @@ public class Incrementer extends Module {
     }
 
     /**
-     * Returns the karma of a string
-     * @param value The value to get teh karma of
-     * @return the karma of the value
+     * Returns the karma of a keyword
+     * @param value The keyword to get the karma of
+     * @return The karma of the keyword
      */
     public int getKarma(String value) {
 
@@ -76,55 +79,26 @@ public class Incrementer extends Module {
 		message = message.toLowerCase();
 		logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
 		
-		// Check to see if it's addressed to us, and if the command is karma
+		// If the command is karma
 		if(message.charAt(0) == Common.PREFIX && Common.getCommand(message).equals("karma")) {
 				logger.info("Returning the karma of " + message.substring(1));		
 				say("IncBot", user + ": " + Integer.toString(getKarma(Common.getMessage(message))));
-			}
+		}
+
+		// Otherwise, search it for ++s
+		// match non-whitespace, look ahead for the last instance of ++
+		Matcher m = Pattern.compile("\\S+(?=\\+\\+)").matcher(message);
+		while(m.find()) {
+			String keyword = m.group();
+			increment(keyword.substring(0, keyword.length() - 2));
+		}
 
 	}
-	
-	//This could be done better with String.substring(), but I already coded it, thus screwing my ability to figure out what this all does in a year's time
-
-	boolean one = false;
-	char[] str = message.toCharArray();
-	ArrayList<Integer> spaces = new ArrayList<Integer>();
-	spaces.add(0);
-
-	for(int i = 0; i<str.length; i + + ) {
-
-	    if(str[i] ==' + ') {
-
-		if(one) {
-
-		    int space = (int)spaces.get(spaces.size()-1);
-		    char[] string = new char[(i-1)-space];
-		    int k = string.length-1;
-		    for(int j = i-2; j> =space; j--) {
-
-			string[k] = str[j];
-			k--;
-
-		    }
-
-		    increment(new String(string));
-		    
-		} else one = true;
-
-	    } else if(str[i] ==' ') {
-
-		spaces.add(i + 1);
-
-	    } else if(one) one = false;
-
-	}
-
-    }
 
     @Override
     public String toString() {
 
-	return "IncBot";
+		return "IncBot";
 
     }
 

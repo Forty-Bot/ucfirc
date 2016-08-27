@@ -164,7 +164,7 @@ public abstract class Common {
     public static String randomString() {
 
 		StringBuffer randomS = new StringBuffer();
-		for(int i = 0; i<32; i + + ) {
+		for(int i = 0; i<32; i++ ) {
 			int index = random.nextInt(ALLOWED_CHARACTERS_LENGTH);
 			randomS = randomS.append(ALLOWED_CHARACTERS.charAt(index));
 		}
@@ -190,7 +190,7 @@ public abstract class Common {
 		int len = string.length();
 		StringBuilder sb = new StringBuilder(len + 4);
 
-		for (i = 0; i < len; i + = 1) {
+		for (i = 0; i < len; i += 1) {
 			b = c;
 			c = string.charAt(i);
 			switch (c) {

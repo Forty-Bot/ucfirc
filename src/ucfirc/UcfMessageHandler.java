@@ -177,7 +177,7 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler {
 	    try {
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		for(String line = in.readLine(); line! =null; line = in.readLine()) {
+		for(String line = in.readLine(); line != null; line = in.readLine()) {
 
 		    logger.trace("RESP: " + line);
 

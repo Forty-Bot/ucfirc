@@ -122,7 +122,7 @@ public class UcfBot extends PircBot {
      */
     private void chatConnect(String hostname, int port, String password) {
 
-	for(int i = 0; i<maxConnectAttempts; i + + ) {
+	for(int i = 0; i<maxConnectAttempts; i++ ) {
 	    try {
 
 		connect(hostname, port, password);
@@ -372,7 +372,7 @@ public class UcfBot extends PircBot {
 	if(!isIRCUser(user)) return false;
 	User[] users = this.getUsers(talkChannel);
 	int i;
-	for(i =0; i<users.length; i + + ) {
+	for(i =0; i<users.length; i++ ) {
 
 	    if(users[i].toString().equals(user)) break;
 
