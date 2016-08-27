@@ -20,7 +20,7 @@ import java.util.LinkedList;
  * Server that handles messages from casiocalc
  * @author sean
  */
-public class UcfServer implements HttpHandler{
+public class UcfServer implements HttpHandler {
 
     static final Logger logger = Logger.getLogger(UcfServer.class.getCanonicalName());
     private UcfBot bot;
@@ -29,7 +29,7 @@ public class UcfServer implements HttpHandler{
      * Creates a new server
      * @param bot The bot to be attached to
      */
-    public UcfServer(UcfBot bot){
+    public UcfServer(UcfBot bot) {
 
 	this.bot = bot;
 
@@ -38,11 +38,11 @@ public class UcfServer implements HttpHandler{
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-	logger.trace("Recieved request from "+exchange.getRemoteAddress().getHostName());
+	logger.trace("Recieved request from " + exchange.getRemoteAddress().getHostName());
 
-	if(!(exchange.getRequestMethod().equals("POST"))){  //If the request was not post, return an error
+	if(!(exchange.getRequestMethod().equals("POST"))) {  //If the request was not post, return an error
 
-	    sendError(exchange, "Bad method: "+exchange.getRequestMethod(), HttpURLConnection.HTTP_BAD_METHOD);
+	    sendError(exchange, "Bad method: " + exchange.getRequestMethod(), HttpURLConnection.HTTP_BAD_METHOD);
 	    return;
 
 	}
@@ -53,7 +53,7 @@ public class UcfServer implements HttpHandler{
 	for(String line = body.readLine(); line! =null; line = body.readLine()) {
 
 	    buffer.add(line);
-	    logger.trace("RECV: "+line);
+	    logger.trace("RECV: " + line);
 
 	}
 
@@ -62,20 +62,20 @@ public class UcfServer implements HttpHandler{
 	String inDigest = headers.getFirst("AuthChallengeKey");
 
 	String messageDigest = Common.getHash(buffer);  //Compute our message digest
-	String key = random+Common.SALT+messageDigest;
+	String key = random + Common.SALT + messageDigest;
 	String outDigest = Common.toHex(Common.getMessageDigest().digest(key.getBytes()));
 	
 
-	logger.trace("Input Digest: "+inDigest+" Random: "+random+" Message Digest: "+messageDigest+" Computed Digest: "+outDigest);
+	logger.trace("Input Digest: " + inDigest + " Random: " + random + " Message Digest: " + messageDigest + " Computed Digest: " + outDigest);
 
-	if(!(outDigest.equals(inDigest))){  //If they're not equal, complain
+	if(!(outDigest.equals(inDigest))) {  //If they're not equal, complain
 
-	    sendError(exchange, "Invalid digest: "+inDigest, HttpURLConnection.HTTP_UNAUTHORIZED);
+	    sendError(exchange, "Invalid digest: " + inDigest, HttpURLConnection.HTTP_UNAUTHORIZED);
 	    return;
 
 	}
 
-	for(String line: buffer){  //Parse each line from the server
+	for(String line: buffer) {  //Parse each line from the server
 
 	    try {
 
@@ -85,16 +85,16 @@ public class UcfServer implements HttpHandler{
 		String message = json.getString("message");
 		int type = json.getInt("type");
 
-		switch(type){  //Switch for message types
+		switch(type) {  //Switch for message types
 		    case 0: bot.error(message); break;
 		    case 1: bot.say(user, message); break;
 		    case 2: bot.channel(user, message); break;
 		    case 3: bot.action(user, message); break;
-		    default: logger.debug("Invalid message type: "+type); break;
+		    default: logger.debug("Invalid message type: " + type); break;
 		}
 
 	    } catch (JSONException e) {
-		logger.debug("Unable to parse line from server: "+line);
+		logger.debug("Unable to parse line from server: " + line);
 	    }
 
 	}
@@ -113,7 +113,7 @@ public class UcfServer implements HttpHandler{
      */
     private void sendError(HttpExchange exchange, java.lang.String error, int errorCode) throws IOException {
 
-	logger.debug("Illegal request from "+exchange.getRemoteAddress().getHostName()+": "+error);
+	logger.debug("Illegal request from " + exchange.getRemoteAddress().getHostName() + ": " + error);
 	exchange.sendResponseHeaders(errorCode, 0);
 	exchange.close();
 	return;
@@ -122,7 +122,7 @@ public class UcfServer implements HttpHandler{
     }
 
     @Override
-    public void finalize() throws Throwable{
+    public void finalize() throws Throwable {
 
 	super.finalize();
 

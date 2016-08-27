@@ -15,7 +15,7 @@ import java.util.Properties;
  * Linker class (echos a prededermined response when 
  * @author sean
  */
-public class Linker extends Module{
+public class Linker extends Module {
 
     static final Logger logger = Logger.getLogger(Linker.class.getCanonicalName());
     static final String PROPERTY = "link";
@@ -27,7 +27,7 @@ public class Linker extends Module{
      *
      * @param bot
      */
-    public Linker(UcfBot bot){
+    public Linker(UcfBot bot) {
 
 	super(bot);
 	links = new Properties();
@@ -45,10 +45,10 @@ public class Linker extends Module{
      * @param keyword
      * @param response
      */
-    public void setLink(String keyword, String response){
+    public void setLink(String keyword, String response) {
 
 	links.setProperty(keyword, response);
-	logger.trace("Linked "+keyword+" to \""+response+"\"");
+	logger.trace("Linked " + keyword + " to \"" + response + "\"");
 	try {
 	    links.store(Common.getOutputStreamFromProperty(PROPERTY), "Auto-Generated increments file");
 	} catch (IOException ex) {
@@ -62,7 +62,7 @@ public class Linker extends Module{
      * @param keyword
      * @return
      */
-    public String getLink(String keyword){
+    public String getLink(String keyword) {
 
 	return links.getProperty(keyword, "");
 
@@ -72,20 +72,20 @@ public class Linker extends Module{
     public void handleSay(String user, String message) {
 
 	message =message.toLowerCase();
-	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
+	logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
 
-	if(message.charAt(0) == Common.PREFIX){  //It's for me!
+	if(message.charAt(0) == Common.PREFIX) {  //It's for me!
 
 	    String mess = message.substring(1);
 
-	    if(Common.getCommand(mess).equals("link")){
+	    if(Common.getCommand(mess).equals("link")) {
 
 		if(!bot.isMod(user)) return;
 		String keyword = Common.getCommand(Common.getMessage(mess));
 		String response = Common.getMessage(Common.getMessage(mess));
 		setLink(keyword, response);
 
-	    } else{
+	    } else {
 
 		if(!getLink(Common.getCommand(mess)).equals("")) say(this.toString(), getLink(Common.getCommand(mess)));
 
@@ -95,7 +95,7 @@ public class Linker extends Module{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
 	return "KarmaBot";
 

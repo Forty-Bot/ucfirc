@@ -68,7 +68,7 @@ public abstract class Main {
 
 	try {
 	    HttpServer server = HttpServer.create(new InetSocketAddress(port), 2);
-	    logger.info("Opened a new server on port "+port);
+	    logger.info("Opened a new server on port " + port);
 	    server.createContext("/", handler);
 	    server.start();
 	    logger.info("Server successfully started!");

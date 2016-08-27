@@ -15,10 +15,10 @@ import org.apache.log4j.Logger;
 
 /**
  * Incrementer module
- * (x++ and such) use !karma &ltkeyword&gt
+ * (x + + and such) use !karma &ltkeyword&gt
  * @author sean
  */
-public class Incrementer extends Module{
+public class Incrementer extends Module {
     
     
     Properties increments;
@@ -30,16 +30,16 @@ public class Incrementer extends Module{
      * Creates a new incrementer
      * @param bot The bot to use
      */
-    public Incrementer(UcfBot bot){
+    public Incrementer(UcfBot bot) {
 	
-	super(bot);
-	increments = new Properties();
-	try {
-	    increments.load(Common.getInputStreamFromProperty(PROPERTY));
-	} catch (IOException e) {
-	    logger.fatal("Could not load increments file");
-	    throw new Error("Could not load increments file");
-	}
+		super(bot);
+		increments = new Properties();
+		try {
+			increments.load(Common.getInputStreamFromProperty(PROPERTY));
+		} catch (IOException e) {
+			logger.fatal("Could not load increments file");
+			throw new Error(e);
+		}
 		
     }
 
@@ -47,15 +47,15 @@ public class Incrementer extends Module{
      * Increments a string
      * @param incrementee The string to increment
      */
-    public void increment(String incrementee){
+    public void increment(String incrementee) {
 
-	increments.setProperty(incrementee, Integer.toString(getKarma(incrementee)+1));
-	logger.trace("Incremented "+incrementee);
-	try {
-	    increments.store(Common.getOutputStreamFromProperty(PROPERTY), "Auto-Generated increments file");
-	} catch (IOException ex) {
-	    logger.error("Could not store to increments file");
-	}
+		increments.setProperty(incrementee, Integer.toString(getKarma(incrementee) + 1));
+		logger.trace("Incremented " + incrementee);
+		try {
+			increments.store(Common.getOutputStreamFromProperty(PROPERTY), "Auto-Generated increments file");
+		} catch (IOException ex) {
+			logger.error("Could not store to increments file");
+		}
 
     }
 
@@ -64,29 +64,23 @@ public class Incrementer extends Module{
      * @param value The value to get teh karma of
      * @return the karma of the value
      */
-    public int getKarma(String value){
+    public int getKarma(String value) {
 
-	return Integer.decode(increments.getProperty(value, "0"));
+		return Integer.decode(increments.getProperty(value, "0"));
 
     }
 
     @Override
     public void handleSay(String user, String message) {
 
-	message =message.toLowerCase();
-	logger.trace("Handling message \""+message+"\" from \""+user+"\"");
-	
-	if(message.charAt(0) ==Common.PREFIX){  //It's for me!
-
-	    String mess = message.substring(1);
-	    System.out.print(mess+" ");
-	    System.out.println(Arrays.toString(mess.split(" ",2)));
-	    if(Common.getCommand(message).equals("karma")){
-
-		logger.info("Returning the value of "+mess);		
-		say("IncBot", user+": "+Integer.toString(getKarma(Common.getMessage(message))));  //Returns the value of the first word in the message
-
-	    }
+		message = message.toLowerCase();
+		logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
+		
+		// Check to see if it's addressed to us, and if the command is karma
+		if(message.charAt(0) == Common.PREFIX && Common.getCommand(message).equals("karma")) {
+				logger.info("Returning the karma of " + message.substring(1));		
+				say("IncBot", user + ": " + Integer.toString(getKarma(Common.getMessage(message))));
+			}
 
 	}
 	
@@ -97,16 +91,16 @@ public class Incrementer extends Module{
 	ArrayList<Integer> spaces = new ArrayList<Integer>();
 	spaces.add(0);
 
-	for(int i = 0; i<str.length; i++){
+	for(int i = 0; i<str.length; i + + ) {
 
-	    if(str[i] =='+') {
+	    if(str[i] ==' + ') {
 
-		if(one){
+		if(one) {
 
 		    int space = (int)spaces.get(spaces.size()-1);
 		    char[] string = new char[(i-1)-space];
 		    int k = string.length-1;
-		    for(int j = i-2; j> =space; j--){
+		    for(int j = i-2; j> =space; j--) {
 
 			string[k] = str[j];
 			k--;
@@ -117,9 +111,9 @@ public class Incrementer extends Module{
 		    
 		} else one = true;
 
-	    } else if(str[i] ==' '){
+	    } else if(str[i] ==' ') {
 
-		spaces.add(i+1);
+		spaces.add(i + 1);
 
 	    } else if(one) one = false;
 
@@ -128,7 +122,7 @@ public class Incrementer extends Module{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
 	return "IncBot";
 

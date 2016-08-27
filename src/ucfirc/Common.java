@@ -74,7 +74,7 @@ public abstract class Common {
      * @param string The string to find
      * @return Whether it was found
      */
-    public static boolean hasString(String[] array, String string){
+    public static boolean hasString(String[] array, String string) {
 
 	for(String stringA:array) if(stringA.equals(string)) return true;
 	return false;
@@ -87,52 +87,46 @@ public abstract class Common {
      * @param bytes The byte array to convert
      * @return The hex representation
      */
-    public static String toHex(byte[] bytes){
+    public static String toHex(byte[] bytes) {
 
-	StringBuilder sb = new StringBuilder(bytes.length * 2);
-	for (byte b : bytes){
-	    sb.append(String.format("%02x", 0xFF & b));
+		StringBuilder sb = new StringBuilder(bytes.length * 2);
+		for (byte b : bytes) {
+			sb.append(String.format("%02x", 0xFF & b));
+		}
+		return sb.toString();
+    
 	}
-	return sb.toString();
-
-    }
 
     /**
      * Gets a new instance of the message digest class for the sha-1 algorithm
      * @return The MessageDigest
      */
-    public static MessageDigest getMessageDigest(){
+    public static MessageDigest getMessageDigest() {
 
-	if(pdigest ==null){
+		if(pdigest ==null) {
 
-	    try {
-		pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
-		return pdigest;
-	    } catch (NoSuchAlgorithmException e) {
-		LOGGER.fatal("FATAL ERROR: Unable to load the algorithm \"SHA-1\"");
-		throw new Error("Unable to load the algorithm \"sha-1\"", e);
-	    }
+			try {
+				pdigest = MessageDigest.getInstance("SHA-1"); //Fetch a message digest
+				return pdigest;
+			} catch (NoSuchAlgorithmException e) {
+				LOGGER.fatal("FATAL ERROR: Unable to load the algorithm \"SHA-1\"");
+				throw new Error("Unable to load the algorithm \"sha-1\"", e);
+			}
+		}
+		else {
 
-	}
-	else{
-
-	    MessageDigest digest;
-	    try{
-
-		digest = (MessageDigest) pdigest.clone();
-		pdigest.reset();
-		return digest;
-
-	    }
-	    catch(CloneNotSupportedException e){
-
-		LOGGER.fatal("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");  //Won't happen
-		throw new Error("Unable to clone the message digest (highly impossible, try visiting milliways to top off your morning)");
-
-	    }
-
-	}
-	
+			MessageDigest digest;
+			try {
+				digest = (MessageDigest) pdigest.clone();
+				pdigest.reset();
+				return digest;
+			}
+			catch(CloneNotSupportedException e) {
+				LOGGER.fatal("Unable to clone the message digest "
+					 + "(highly impossible, try visiting milliways to top off your morning)");
+				throw new Error(e);
+			}
+		}
 
     }
 
@@ -141,52 +135,40 @@ public abstract class Common {
      * @param lines The LinkedList of strings
      * @return The hash of the strings; will return null on non-unix systems
      */
-    public static String getHash(LinkedList<String> lines){
+    public static String getHash(LinkedList<String> lines) {
 
-	MessageDigest digest = getMessageDigest();  //Fetch us a digest
-	PrintStream out;
-	//try {
-	//    out = new PrintStream(new DigestOutputStream(new FileOutputStream("/dev/null"), digest));
-	//} catch (FileNotFoundException ex) {
-	//    LOGGER.error("/dev/null not found: try on a unix system");
-	//   return null;
-	//}
-	out = new PrintStream(new DigestOutputStream(new OutputStream() {
+		MessageDigest digest = getMessageDigest();  //Fetch us a digest
+		PrintStream out = new PrintStream(new DigestOutputStream(new OutputStream() {
 
-		@Override
-		public void write(int b) {}
-		@Override
-		public void write(byte[] b) {}
-		@Override
-		public void write(byte[] b, int off, int len) {}
+			@Override
+			public void write(int b) {}
+			@Override
+			public void write(byte[] b) {}
+			@Override
+			public void write(byte[] b, int off, int len) {}
 
 
-	 }, digest));
-	
+		 }, digest));
+		
+		for(String line: lines) {
+			out.println(line);
+		}
 
-	for(String line: lines){
-
-	    out.println(line);
-
-	}
-
-	return toHex(digest.digest());
+		return toHex(digest.digest());
 
     }
 
     /**
      * Returns a 32 character random string with the values in ALLOWED_CHARACTERS
      */
-    public static String randomString(){
+    public static String randomString() {
 
-	StringBuffer randomS = new StringBuffer();
-	for(int i = 0; i<32; i++){
-
-	    int index = random.nextInt(ALLOWED_CHARACTERS_LENGTH);
-	    randomS = randomS.append(ALLOWED_CHARACTERS.charAt(index));
-
-	}
-	return randomS.toString();
+		StringBuffer randomS = new StringBuffer();
+		for(int i = 0; i<32; i + + ) {
+			int index = random.nextInt(ALLOWED_CHARACTERS_LENGTH);
+			randomS = randomS.append(ALLOWED_CHARACTERS.charAt(index));
+		}
+		return randomS.toString();
 
     }
 
@@ -195,61 +177,59 @@ public abstract class Common {
      * @param string The string to escape
      * @return The escaped string
      */
-    public static String escape(String string){
+    public static String escape(String string) {
 
-	if (string == null || string.length() == 0) {
-	    return "";
-	}
-
-	char b;
-	char c = 0;
-	String hhhh;
-	int i;
-	int len = string.length();
-	StringBuilder sb = new StringBuilder(len + 4);
-
-	for (i = 0; i < len; i + = 1) {
-	    b = c;
-	    c = string.charAt(i);
-	    switch (c) {
-	    case '\\':
-	    case '"':
-		sb.append('\\');
-		sb.append(c);
-		break;
-	    case '/':
-		if (b == '<') {
-		    sb.append('\\');
+		if (string == null || string.length() == 0) {
+			return "";
 		}
-		sb.append(c);
-		break;
-	    case '\b':
-		sb.append("\\b");
-		break;
-	    case '\t':
-		sb.append("\\t");
-		break;
-	    case '\n':
-		sb.append("\\n");
-		break;
-	    case '\f':
-		sb.append("\\f");
-		break;
-	    case '\r':
-		sb.append("\\r");
-		break;
-	    default:
-		if (c < ' ' || (c > = '\u0080' && c < '\u00a0') ||
-			       (c > = '\u2000' && c < '\u2100')) {
-		    hhhh = "000" + Integer.toHexString(c);
-		    sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
-		} else {
-		    sb.append(c);
-		}
-	    }
-	}
-	return sb.toString();
 
+		char b;
+		char c = '\0';
+		String hhhh;
+		int i;
+		int len = string.length();
+		StringBuilder sb = new StringBuilder(len + 4);
+
+		for (i = 0; i < len; i + = 1) {
+			b = c;
+			c = string.charAt(i);
+			switch (c) {
+			case '\\':
+			case '"':
+				sb.append('\\');
+				sb.append(c);
+				break;
+			case '/':
+				if (b == '<') {
+					sb.append('\\');
+				}
+				sb.append(c);
+				break;
+			case '\b':
+				sb.append("\\b");
+				break;
+			case '\t':
+				sb.append("\\t");
+				break;
+			case '\n':
+				sb.append("\\n");
+				break;
+			case '\f':
+				sb.append("\\f");
+				break;
+			case '\r':
+				sb.append("\\r");
+				break;
+			default:
+				if (c < ' ' || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) {
+					hhhh = "000" + Integer.toHexString(c);
+					sb.append("\\u").append(hhhh.substring(hhhh.length() - 4));
+				} else {
+					sb.append(c);
+				}
+			}
+		}
+		return sb.toString();
 
     }
 
@@ -259,9 +239,9 @@ public abstract class Common {
      * @param property  The property that has the file name
      * @return The file
      */
-    public static File getFileFromProperty(String property){
+    public static File getFileFromProperty(String property) {
 
-	return new File(HOME+File.separatorChar+Main.properties.getProperty(property));
+		return new File(HOME + File.separatorChar + Main.properties.getProperty(property));
 
     }
 
@@ -271,43 +251,58 @@ public abstract class Common {
      * @throws NullPointerException If the file doesn't exist
      * @return The InputStream (If all goes well)
      */
-    public static InputStream getInputStreamFromProperty(String property){
-	try {
-	    return new FileInputStream(getFileFromProperty(property));
-	} catch (FileNotFoundException e) {
-	    LOGGER.fatal("Unable to find file for the property \""+property+"\" with the value of \""+Main.properties.getProperty(property)+": "+e.getMessage());
-	    return null;
-	}
+    public static InputStream getInputStreamFromProperty(String property) {
+		
+		try {
+			return new FileInputStream(getFileFromProperty(property));
+		} catch (FileNotFoundException e) {
+			LOGGER.fatal("Unable to find file for the property \"" + property
+				 + "\" with the value of \"" + Main.properties.getProperty(property) + ": " + e.getMessage());
+			return null;
+		}
 
     }
 
     /**
      * @see UcfIrc.Common.getInputStreamFromProperty(java.lang.String)
      */
-    public static OutputStream getOutputStreamFromProperty(String property){
+    public static OutputStream getOutputStreamFromProperty(String property) {
 
-	try{
-	    return new FileOutputStream(getFileFromProperty(property));
-	} catch(FileNotFoundException e) {
-	    LOGGER.fatal("Unable to find file for the property \""+property+"\" with the value of \""+Main.properties.getProperty(property)+": "+e.getMessage());
-	    return null;
-	}
+		try {
+			return new FileOutputStream(getFileFromProperty(property));
+		} catch(FileNotFoundException e) {
+			LOGGER.fatal("Unable to find file for the property \"" + property
+				 + "\" with the value of \"" + Main.properties.getProperty(property) + ": " + e.getMessage());
+			return null;
+		}
 
     }
 
     /**
-     * Gets the command (the first word) for a givven message
+     * Gets the command (the first word) for a given message
      * @param message The message to extract the command from
      */
-    public static String getCommand(String message) {return message.split(" ",2)[0];}
+    public static String getCommand(String message) {
+		
+		return message.split(" ",2)[0];
+
+	}
 
     /**
      * Gets the message sans the command
      * @param message The message
      * @return
      */
-    public static String getMessage(String message) {return message.split(" ",2)[1];}
+    public static String getMessage(String message) {
+		
+		return message.split(" ",2)[1];
+	
+	}
 
-    public static String getRandomElement(String[] array){return array[(int) (Math.random()*array.length)];}
+    public static String getRandomElement(String[] array) {
+		
+		return array[(int) (Math.random()*array.length)];
+	
+	}
 
 }

@@ -9,7 +9,7 @@ package ucfirc;
  * Superclass for modules
  * @author sean
  */
-public class Module implements MessageHandler{
+public class Module implements MessageHandler {
 
     /**
      * Forward incoming messages (from server)
@@ -22,7 +22,7 @@ public class Module implements MessageHandler{
      * Creates a new module
      * @param bot The bot to use
      */
-    protected Module(UcfBot bot){
+    protected Module(UcfBot bot) {
 
 	this.bot = bot;
 
@@ -39,7 +39,7 @@ public class Module implements MessageHandler{
     /**
      * Sends a say to both the bot and the server
      */
-    public void say(String user, String message){
+    public void say(String user, String message) {
 
 	bot.say(user, message);  //To channel
 	bot.handleSay(user, message);  //To ucf
@@ -48,7 +48,7 @@ public class Module implements MessageHandler{
     /**
      * Sends a channel to both the bot and the server
      */
-    public void channel(String user, String message){
+    public void channel(String user, String message) {
 
 	bot.channel(user, message);  //To channel
 	bot.handleChannel(user, message);  //To ucf
@@ -57,7 +57,7 @@ public class Module implements MessageHandler{
     /**
      * Sends an action to both the bot and the server
      */
-    public void action(String user, String message){
+    public void action(String user, String message) {
 
 	bot.action(user, message);  //To channel
 	bot.handleAction(user, message);  //To ucf

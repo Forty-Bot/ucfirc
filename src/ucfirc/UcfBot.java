@@ -18,7 +18,7 @@ import java.util.Properties;
  * All communication with the IRC server goes through this class, it also handles basic functionality (rejoining on kick, etc.)
  * @author sean
  */
-public class UcfBot extends PircBot{
+public class UcfBot extends PircBot {
 
     private boolean reconnect = true;
     static final Logger logger = Logger.getLogger(UcfBot.class.getCanonicalName());
@@ -75,13 +75,13 @@ public class UcfBot extends PircBot{
 	this.modules = modules;
 	messageHandler = handler;
 
-	setVersion("Ucf Irc Chatbot "+version+" casiocalc.org");
+	setVersion("Ucf Irc Chatbot " + version + " casiocalc.org");
 	setLogin("UcfIrc");
 	
     }
 
     @Override
-    public void onDisconnect(){
+    public void onDisconnect() {
 
 	logger.info("Disconnected from server");
 	chatReconnect();
@@ -94,7 +94,7 @@ public class UcfBot extends PircBot{
     public void chatReconnect() {
 
 	if(!(reconnect)) return;  //Don't reconnect if reconnect is false
-	logger.debug("(Re)connecting to "+server);
+	logger.debug("(Re)connecting to " + server);
 	chatConnect(server, port, password);
 	
     }
@@ -104,7 +104,7 @@ public class UcfBot extends PircBot{
      * <pre>chatConnect(hostname, 6667, null)</pre>
      * @param hostname The server to connect to
      */
-    private void chatConnect(String hostname){chatConnect(hostname, 6667);}
+    private void chatConnect(String hostname) {chatConnect(hostname, 6667);}
 
     /**
      * Convenience method to connect to a server, same as<br />
@@ -112,7 +112,7 @@ public class UcfBot extends PircBot{
      * @param hostname The server to connect to
      * @param port The port to use
      */
-    private void chatConnect(String hostname, int port){chatConnect(hostname,port,null);}
+    private void chatConnect(String hostname, int port) {chatConnect(hostname,port,null);}
 
     /**
      * Convenience method to connect to a server, should be used instead of connect()
@@ -122,44 +122,44 @@ public class UcfBot extends PircBot{
      */
     private void chatConnect(String hostname, int port, String password) {
 
-	for(int i = 0; i<maxConnectAttempts; i++) {
-	    try{
+	for(int i = 0; i<maxConnectAttempts; i + + ) {
+	    try {
 
 		connect(hostname, port, password);
-		logger.info("Successfuly conected to "+hostname);
+		logger.info("Successfuly conected to " + hostname);
 		joinChannel(talkChannel);
 		return;
 
 	    }
-	    catch(NickAlreadyInUseException e){
+	    catch(NickAlreadyInUseException e) {
 
-		logger.debug("Someone is already using the nickname "+getNick());
+		logger.debug("Someone is already using the nickname " + getNick());
 		if(!(i<maxConnectAttempts-1)) break;  //Don't bother reconecting if we're just gonna exit the loop
-		String newNick = getNick().substring(0, getNick().length()-1)+i;  //Replace the last char in the current nick with the current iteration
+		String newNick = getNick().substring(0, getNick().length()-1) + i;  //Replace the last char in the current nick with the current iteration
 		setName(newNick);
-		logger.debug("Retrying with the nick \""+newNick+"\" in "+reconnectDelay+" ms ["+i+" of "+maxConnectAttempts+"]");
+		logger.debug("Retrying with the nick \"" + newNick + "\" in " + reconnectDelay + " ms [" + i + " of " + maxConnectAttempts + "]");
 
 	    }
-	    catch(IrcException e){
+	    catch(IrcException e) {
 
-		logger.warn("Unable to connect: "+hostname+" would not let us join it");
+		logger.warn("Unable to connect: " + hostname + " would not let us join it");
 
 	    }
-	    catch(IOException e){
+	    catch(IOException e) {
 
 		if(e.getMessage().equals("The PircBot is already connected to an IRC server.  Disconnect first.")) {logger.trace("Cannot reconnect withoit disconnecting first"); return;}
-		logger.debug("Unable to connect to "+hostname+": "+e.getMessage());
-		logger.debug("Retrying in "+reconnectDelay+" ms ["+i+" of "+maxConnectAttempts+"]");
+		logger.debug("Unable to connect to " + hostname + ": " + e.getMessage());
+		logger.debug("Retrying in " + reconnectDelay + " ms [" + i + " of " + maxConnectAttempts + "]");
 
 	    }
 
 	    try {
 		Thread.sleep(reconnectDelay);
-	    } catch (InterruptedException e){}
+	    } catch (InterruptedException e) {}
 
 	}
 
-	logger.error("Unable to connect to "+hostname);
+	logger.error("Unable to connect to " + hostname);
 
     }
 
@@ -167,14 +167,14 @@ public class UcfBot extends PircBot{
     public void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
 
 	if(!(channel.equals(talkChannel))) return;  //Don't bother doing anything if it's not talkchannel
-	if(!(recipientNick.equals(getName()))){  //If it's not us tell someone about it
+	if(!(recipientNick.equals(getName()))) {  //If it's not us tell someone about it
 
-	    channelModules(recipientNick, "was kicked from the channel by "+kickerNick+": "+reason);
-	    logger.trace(">>> *"+recipientNick+"was kicked from the channel by "+kickerNick+": "+reason);
+	    channelModules(recipientNick, "was kicked from the channel by " + kickerNick + ": " + reason);
+	    logger.trace(">>> *" + recipientNick + "was kicked from the channel by " + kickerNick + ": " + reason);
 
-	} else{
+	} else {
 
-	    logger.info("We were kicked from "+channel+" by "+kickerNick+": "+reason);
+	    logger.info("We were kicked from " + channel + " by " + kickerNick + ": " + reason);
 	    try {Thread.sleep(kickDelay);} catch (InterruptedException e) {}
 	    joinChannel(talkChannel);
 	    
@@ -186,7 +186,7 @@ public class UcfBot extends PircBot{
      * Convenience method to handle common problems when sending a message
      * @param message The message to send
      */
-    private void sendMessage(String message){
+    private void sendMessage(String message) {
 
 	if(!(isConnected())) chatReconnect();  //If we aren't connected, reconnect
 	if(!(Common.hasString(getChannels(), talkChannel))) joinChannel(talkChannel);  //If we aren't in the channel, join it
@@ -198,7 +198,7 @@ public class UcfBot extends PircBot{
      * Sends an error to the channel
      * @param error The error to esnd
      */
-    public void error(String error){
+    public void error(String error) {
 
 	logger.warn(error);
 	sendMessage(error);
@@ -211,11 +211,11 @@ public class UcfBot extends PircBot{
      * @param user The user to send from
      * @param message The message to send
      */
-    public void say(String user, String message){
+    public void say(String user, String message) {
 
-	logger.trace(">>> ["+user+"] "+message);
-	sendMessage("["+user+"] "+message);
-	for(MessageHandler handler: modules) {handler.handleSay(user, message); logger.debug("Sent message to "+handler);}
+	logger.trace(">>> [" + user + "] " + message);
+	sendMessage("[" + user + "] " + message);
+	for(MessageHandler handler: modules) {handler.handleSay(user, message); logger.debug("Sent message to " + handler);}
 
     }
 
@@ -229,10 +229,10 @@ public class UcfBot extends PircBot{
      * @param user The user this message applies to
      * @param message The message about the user
      */
-    public void channel(String user, String message){
+    public void channel(String user, String message) {
 
-	logger.trace(">>> *"+user+" "+message);
-	sendMessage("*"+user+" "+message);
+	logger.trace(">>> *" + user + " " + message);
+	sendMessage("*" + user + " " + message);
 	for(MessageHandler handler: modules) handler.handleChannel(user, message);
 
     }
@@ -245,23 +245,23 @@ public class UcfBot extends PircBot{
      * @param user The user that did the action
      * @param action The action performed
      */
-    public void action(String user, String action){
+    public void action(String user, String action) {
 
-	logger.trace(">>> ***"+user+" "+action);
-	sendMessage("***"+user+" "+action);
+	logger.trace(">>> ***" + user + " " + action);
+	sendMessage("***" + user + " " + action);
 	for(MessageHandler handler: modules) handler.handleAction(user, action);
 
     }
 
     @Override
-    public void log(String message){
+    public void log(String message) {
 
 	logger.debug(message);
 
     }
 
     @Override
-    public void finalize() throws Throwable{
+    public void finalize() throws Throwable {
 
 	if(!(isConnected())) return;
 	reconnect = false;
@@ -277,10 +277,10 @@ public class UcfBot extends PircBot{
 
 	if(!(channel.equals(talkChannel))) return;
 	if(sender.equals(getName())) return;
-	logger.trace(channel+" "+sender+" "+login+" "+hostname+" "+message);
+	logger.trace(channel + " " + sender + " " + login + " " + hostname + " " + message);
 	sayModules(sender, message);  //Calls the sayModules method of all modules
 	messageHandler.handleSay(sender, message);
-	logger.trace(">>> ["+sender+"] "+message);
+	logger.trace(">>> [" + sender + "] " + message);
 
     }
     
@@ -294,7 +294,7 @@ public class UcfBot extends PircBot{
 
 	channelModules(sender, message);
 	messageHandler.handleChannel(sender, message);
-	logger.trace(">>> *"+sender+" "+message);
+	logger.trace(">>> *" + sender + " " + message);
 	
     }
     
@@ -308,7 +308,7 @@ public class UcfBot extends PircBot{
 
 	channelModules(sender, message);
 	messageHandler.handleChannel(sender, message);
-	logger.trace(">>> *"+sender+" "+message);
+	logger.trace(">>> *" + sender + " " + message);
 	
     }
 
@@ -319,12 +319,12 @@ public class UcfBot extends PircBot{
 	if(sender.equals(getName())) return;
 	actionModules(sender, action);
 	messageHandler.handleAction(sender, action);
-	logger.trace(">>> ***"+sender+" "+action);
+	logger.trace(">>> ***" + sender + " " + action);
 
     }
 
     @Override
-    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason){
+    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
 
 	if(sourceNick.equals(getName())) return;
 
@@ -332,21 +332,21 @@ public class UcfBot extends PircBot{
 
 	channelModules(sourceNick, message);
 	messageHandler.handleChannel(sourceNick, message);
-	logger.trace(">>> *"+sourceNick+" "+message);
+	logger.trace(">>> *" + sourceNick + " " + message);
 
     }
 
     @Override
-    public void onNickChange(String oldNick, String login, String hostname, String newNick){
+    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
 
 	if(newNick.equals(getName())) return;
 
 	String message = Common.getRandomElement(changes);
 	logger.fatal(message);
 	
-	channelModules(oldNick, message+" "+newNick);
-	messageHandler.handleChannel(oldNick, message+" "+newNick);
-	logger.trace(">>> *"+oldNick+" "+message+" "+newNick);
+	channelModules(oldNick, message + " " + newNick);
+	messageHandler.handleChannel(oldNick, message + " " + newNick);
+	logger.trace(">>> *" + oldNick + " " + message + " " + newNick);
 
     }
 
@@ -355,7 +355,7 @@ public class UcfBot extends PircBot{
      * @param user The user to check for
      * @return true if an irc user, false otherwise
      */
-    public boolean isIRCUser(String user){
+    public boolean isIRCUser(String user) {
 
 	User[] users = this.getUsers(talkChannel);
 	for(User nick: users) {if(nick.toString().equals(user)) return true;} return false;
@@ -367,18 +367,18 @@ public class UcfBot extends PircBot{
      * @param user The user to test for
      * @return true if mod
      */
-    public boolean isMod(String user){
+    public boolean isMod(String user) {
 
 	if(!isIRCUser(user)) return false;
 	User[] users = this.getUsers(talkChannel);
 	int i;
-	for(i =0; i<users.length; i++){
+	for(i =0; i<users.length; i + + ) {
 
 	    if(users[i].toString().equals(user)) break;
 
 	}
 
-	if(users[i].getPrefix().equals("+") || users[i].getPrefix().equals("+")) return true;
+	if(users[i].getPrefix().equals(" + ") || users[i].getPrefix().equals(" + ")) return true;
 	return false;
 
     }
@@ -387,7 +387,7 @@ public class UcfBot extends PircBot{
      * Returns a list of the modules
      * @return The list of modules
      */
-    public List<Module> getModules(){
+    public List<Module> getModules() {
 
 	return Collections.unmodifiableList(modules);
 
@@ -397,7 +397,7 @@ public class UcfBot extends PircBot{
      * Sets the list of modules
      * @param modules The new list of modules
      */
-    public void setModules(ArrayList<Module> modules){
+    public void setModules(ArrayList<Module> modules) {
 
 	this.modules = modules;
 
@@ -407,7 +407,7 @@ public class UcfBot extends PircBot{
      * Gets the channel we are talking in
      * @return
      */
-    public String getTalkChannel(){return talkChannel;}
+    public String getTalkChannel() {return talkChannel;}
     
     /**
      * Sends a say command to the modules
@@ -427,16 +427,16 @@ public class UcfBot extends PircBot{
     /**
      * Sends a say to the messagehandler
      */
-    public void handleSay(String sender, String message){ messageHandler.handleSay(sender, message);}
+    public void handleSay(String sender, String message) { messageHandler.handleSay(sender, message);}
 
     /**
      * Sends a channel to the messagehandler
      */
-    public void handleChannel(String sender, String message){ messageHandler.handleChannel(sender, message);}
+    public void handleChannel(String sender, String message) { messageHandler.handleChannel(sender, message);}
 
     /**
      * Sends an action to the handler
      */
-    public void handleAction(String sender, String message){ messageHandler.handleAction(sender, message);}
+    public void handleAction(String sender, String message) { messageHandler.handleAction(sender, message);}
 
 }
