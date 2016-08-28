@@ -174,19 +174,19 @@ public class UcfBot extends PircBot {
 		if (!(channel.equals(talkChannel)))
 			return; // Don't bother doing anything if it's not talkchannel
 		if (!(recipientNick.equals(getName()))) { // If it's not us tell someone about it
-
-			channelModules(recipientNick, "was kicked from the channel by " + kickerNick + ": " + reason);
-			logger.trace(">>> *" + recipientNick + "was kicked from the channel by " + kickerNick + ": " + reason);
-
+			Message msg = new Message(recipientNick,
+			                          "was kicked from the chat by " + kickerNick + ": " + reason,
+			                          this,
+			                          Message.Type.CHANNEL);
+			logger.trace(">>> *" + msg.txt); 
 		} else {
-
 			logger.info("We were kicked from " + channel + " by " + kickerNick + ": " + reason);
 			try {
 				Thread.sleep(kickDelay);
 			} catch (InterruptedException e) {
+				// Do nothing
 			}
 			joinChannel(talkChannel);
-
 		}
 
 	}
@@ -219,19 +219,6 @@ public class UcfBot extends PircBot {
 	}
 
 	/**
-	 * Sends an error to the channel
-	 * 
-	 * @param error
-	 *            The error to esnd
-	 */
-	public void error(String error) {
-
-		logger.warn(error);
-		sendMessage(error);
-
-	}
-
-	/**
 	 * Sends a message from a user in the form of<br />
 	 * 
 	 * <pre>
@@ -243,82 +230,15 @@ public class UcfBot extends PircBot {
 	 * @param message
 	 *            The message to send
 	 */
-	public void say(String user, String message) {
+	public void handleMessage(Message msg) {
 
-		logger.trace(">>> [" + user + "] " + message);
-		sendMessage("[" + user + "] " + message);
-		for (MessageHandler handler : handlers) {
-			logger.debug("Sent message to " + handler);
-			handler.handleSay(user, message);
+		String txt = msg.toString();	
+		logger.trace(">>> " + txt);
+		sendMessage(txt);
+		// No point in sending an error to the handlers (which may cause an error)
+		if(msg.type != Message.Type.ERROR) {
+			notifyHandlers(msg);
 		}
-
-	}
-
-	/**
-	 * Sends a channel event in the form of<br />
-	 * 
-	 * <pre>
-	 * *user message
-	 * </pre>
-	 * 
-	 * <br />
-	 * Example output includes:<br />
-	 * 
-	 * <pre>
-	 * *user entered the channel
-	 * *user created a new topic [Topic Name] http://casiocalc.org/topic
-	 * *user was kicked by kicker: reason
-	 * </pre>
-	 * 
-	 * @param user
-	 *            The user this message applies to
-	 * @param message
-	 *            The message about the user
-	 */
-	public void channel(String user, String message) {
-
-		logger.trace(">>> *" + user + " " + message);
-		sendMessage("*" + user + " " + message);
-		for (MessageHandler handler : handlers) {
-			handler.handleChannel(user, message);
-		}
-
-	}
-
-	/**
-	 * Sends an action in the form of<br />
-	 * 
-	 * <pre>
-	 * ***user message
-	 * </pre>
-	 * 
-	 * <br />
-	 * For example:<br />
-	 * 
-	 * <pre>
-	 * ***user actions
-	 * </pre>
-	 * 
-	 * <br />
-	 * 
-	 * @param user
-	 *            The user that did the action
-	 * @param action
-	 *            The action performed
-	 */
-	public void action(String user, String action) {
-
-		logger.trace(">>> ***" + user + " " + action);
-		sendMessage("***" + user + " " + action);
-		for (MessageHandler handler : modules)
-			handler.handleAction(user, action);
-
-	}
-
-	@Override
-	public void log(String message) {
-
-		logger.debug(message);
 
 	}
 
@@ -337,84 +257,79 @@ public class UcfBot extends PircBot {
 	@Override
 	public void onMessage(String channel, String sender, String login, String hostname, String message) {
 
-		if (!(channel.equals(talkChannel)))
+		if (!(channel.equals(talkChannel)) || sender.equals(getName())) {
 			return;
-		if (sender.equals(getName()))
-			return;
+		}
+
+		Message msg = new Message(sender, message, this, Message.Type.SAY);
 		logger.trace(channel + " " + sender + " " + login + " " + hostname + " " + message);
-		sayModules(sender, message); // Calls the sayModules method of all
-										// modules
-		messageHandler.handleSay(sender, message);
-		logger.trace(">>> [" + sender + "] " + message);
+		notifyHandlers(msg);
 
 	}
 
 	@Override
 	public void onJoin(String channel, String sender, String login, String hostname) {
 
-		if (!(channel.equals(talkChannel)))
+		if (!(channel.equals(talkChannel)) || sender.equals(getName())) {
 			return;
-		if (sender.equals(getName()))
-			return;
+		}
 
-		String message = "has joined the chat";
-		channelModules(sender, message);
-		messageHandler.handleChannel(sender, message);
-		logger.trace(">>> *" + sender + " " + message);
+		Message msg = new Message(sender, "has joined the chat", this, Message.Type.CHANNEL);
+		logger.trace(">>> " + msg);
+		notifyHandlers(msg);
 
 	}
 
 	@Override
 	public void onPart(String channel, String sender, String login, String hostname) {
 
-		if (!(channel.equals(talkChannel)))
+		if (!(channel.equals(talkChannel)) || sender.equals(getName())) {
 			return;
-		if (sender.equals(getName()))
-			return;
+		}
 
-		String message = "has left the chat";
-		channelModules(sender, message);
-		messageHandler.handleChannel(sender, message);
-		logger.trace(">>> *" + sender + " " + message);
+		Message msg = new Message(sender, "has joined the chat", this, Message.Type.CHANNEL);
+		logger.trace(">>> " + msg);
+		notifyHandlers(msg);
 
 	}
 
 	@Override
 	public void onAction(String sender, String login, String hostname, String target, String action) {
 
-		if (!(target.equals(talkChannel)))
+		if (!(target.equals(talkChannel)) || sender.equals(getName())) {
 			return;
-		if (sender.equals(getName()))
-			return;
-		actionModules(sender, action);
-		messageHandler.handleAction(sender, action);
-		logger.trace(">>> ***" + sender + " " + action);
+		}
+
+		Message msg = new Message(sender, action, this, Message.Type.ACTION);
+		logger.trace(">>> " + msg);
+		notifyHandlers(msg);
 
 	}
 
 	@Override
 	public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
 
-		if (sourceNick.equals(getName()))
+		if (sourceNick.equals(getName())) {
 			return;
+		}
 
-		String message = "has left the chat";
-		channelModules(sourceNick, message);
-		messageHandler.handleChannel(sourceNick, message);
-		logger.trace(">>> *" + sourceNick + " " + message);
-
+		Message msg = new Message(sourceNick, "has left the chat", this, Message.Type.CHANNEL);
+		logger.trace(">>> " + msg);
+		notifyHandlers(msg);
+	
 	}
 
 	@Override
 	public void onNickChange(String oldNick, String login, String hostname, String newNick) {
 
-		if (newNick.equals(getName()))
+		if (newNick.equals(getName())) {
 			return;
+		}
 
-		String message = "has changed thir name to "
-		channelModules(oldNick, message + newNick);
-		messageHandler.handleChannel(oldNick, message + newNick);
-		logger.trace(">>> *" + oldNick + " " + message + newNick);
+		Message msg = new Message(oldNick, "has changed their name to " + newNick,
+		                          this, Message.Type.CHANNEL);
+		logger.trace(">>> " + msg);
+		notifyHandlers(msg);
 
 	}
 
@@ -429,8 +344,9 @@ public class UcfBot extends PircBot {
 
 		User[] users = this.getUsers(talkChannel);
 		for (User nick : users) {
-			if (nick.toString().equals(user))
+			if (nick.toString().equals(user)) {
 				return true;
+			}
 		}
 		return false;
 
@@ -445,19 +361,21 @@ public class UcfBot extends PircBot {
 	 */
 	public boolean isMod(String user) {
 
-		if (!isIRCUser(user))
+		if (!isIRCUser(user)) {
 			return false;
-		User[] users = this.getUsers(talkChannel);
-		int i;
-		for (i = 0; i < users.length; i++) {
-
-			if (users[i].toString().equals(user))
-				break;
-
 		}
 
-		if (users[i].getPrefix().equals(" + ") || users[i].getPrefix().equals(" + "))
+		User[] users = this.getUsers(talkChannel);
+		User target = null;
+		for (int i = 0; i < users.length; i++) {
+			if (users[i].toString().equals(user)) {
+				target = users[i];
+			}
+		}
+		
+		if (target != null && (target.isOp() || target.hasVoice())) {
 			return true;
+		}
 		return false;
 
 	}
@@ -467,21 +385,21 @@ public class UcfBot extends PircBot {
 	 * 
 	 * @return The list of modules
 	 */
-	public List<Module> getModules() {
+	public List<MessageHandler> getHandlers() {
 
-		return Collections.unmodifiableList(modules);
+		return Collections.unmodifiableList(handlers);
 
 	}
 
-	/**
-	 * Sets the list of modules
-	 * 
-	 * @param modules
-	 *            The new list of modules
-	 */
-	public void setModules(ArrayList<Module> modules) {
+	public void addMessageHandler(MessageHandler mh) {
 
-		this.modules = modules;
+		handlers.add(mh);
+
+	}
+
+	public void removeMessageHandler(MessageHandler mh) {
+		
+		handlers.remove(mh);
 
 	}
 
@@ -491,52 +409,17 @@ public class UcfBot extends PircBot {
 	 * @return
 	 */
 	public String getTalkChannel() {
+		
 		return talkChannel;
+	
 	}
 
-	/**
-	 * Sends a say command to the modules
-	 */
-	public void sayModules(String sender, String message) {
-		for (Module handler : modules)
-			handler.handleSay(sender, message);
-	}
-
-	/**
-	 * Sends a channel command to the modules
-	 */
-	public void channelModules(String sender, String message) {
-		for (Module handler : modules)
-			handler.handleChannel(sender, message);
-	}
-
-	/**
-	 * Sends an action to the modules
-	 */
-	public void actionModules(String sender, String action) {
-		for (Module handler : modules)
-			handler.handleAction(sender, action);
-	}
-
-	/**
-	 * Sends a say to the messagehandler
-	 */
-	public void handleSay(String sender, String message) {
-		messageHandler.handleSay(sender, message);
-	}
-
-	/**
-	 * Sends a channel to the messagehandler
-	 */
-	public void handleChannel(String sender, String message) {
-		messageHandler.handleChannel(sender, message);
-	}
-
-	/**
-	 * Sends an action to the handler
-	 */
-	public void handleAction(String sender, String message) {
-		messageHandler.handleAction(sender, message);
+	public void notifyHandlers(Message msg) {
+	
+		for(MessageHandler mh: handlers) {
+			mh.handleMessage(msg);
+		}
+	
 	}
 
 }

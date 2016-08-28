@@ -16,11 +16,12 @@ import org.apache.log4j.Logger;
  * 
  * @author sean
  */
-public class Incrementer extends Module {
+public class Incrementer implements MessageHandler {
 
 	Properties increments;
 	static final Logger logger = Logger.getLogger(Incrementer.class.getCanonicalName());
 	static final String PROPERTY = "increment";
+	private UcfBot bot;
 
 	/**
 	 * Creates a new incrementer
@@ -30,7 +31,6 @@ public class Incrementer extends Module {
 	 */
 	public Incrementer(UcfBot bot) {
 
-		super(bot);
 		increments = new Properties();
 		try {
 			increments.load(Common.getInputStreamFromProperty(PROPERTY));
@@ -73,20 +73,30 @@ public class Incrementer extends Module {
 	}
 
 	@Override
-	public void handleSay(String user, String message) {
+	public void handleMessage(Message msg) {
 
-		message = message.toLowerCase();
-		logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
+		if(msg.type != Message.Type.SAY) {
+			return;
+		}
 
+		String txt = msg.txt.toLowerCase();
+		logger.trace("Handling message \"" + txt + "\" from \"" + msg.usr + "\"");
+
+		String[] parts = txt.split(" ", 2);
 		// If the command is karma
-		if (message.charAt(0) == Common.PREFIX && Common.getCommand(message).equals("karma")) {
-			logger.info("Returning the karma of " + message.substring(1));
-			say("IncBot", user + ": " + Integer.toString(getKarma(Common.getMessage(message))));
+		if (txt.charAt(0) == Common.PREFIX && parts[0].equals("!karma")) {
+			logger.info("Returning the karma of " + parts[1]);
+			Message msg2 = new Message(this.toString(),
+			                           msg.usr + ": " + Integer.toString(getKarma(parts[1])),
+			                           this,
+			                           Message.Type.SAY);
+			bot.handleMessage(msg2);
+			return;
 		}
 
 		// Otherwise, search it for ++s
 		// match non-whitespace, look ahead for the last instance of ++
-		Matcher m = Pattern.compile("\\S+(?=\\+\\+)").matcher(message);
+		Matcher m = Pattern.compile("\\S+(?=\\+\\+)").matcher(txt);
 		while (m.find()) {
 			increment(m.group());
 		}

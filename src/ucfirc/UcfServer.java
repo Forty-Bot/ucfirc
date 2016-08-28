@@ -52,15 +52,12 @@ public class UcfServer implements HttpHandler {
 
 		}
 
-		// Create a new buferedreader that updates the MessageDigest	
+		// Create a new bufferedreader that updates the MessageDigest	
 		BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody())); 
-		LinkedList<String> buffer = new LinkedList<String>(); // Read the lines
-																// into a buffer
+		LinkedList<String> buffer = new LinkedList<String>(); // Read the lines into a buffer
 		for (String line = body.readLine(); line != null; line = body.readLine()) {
-
 			buffer.add(line);
 			logger.trace("RECV: " + line);
-
 		}
 
 		Headers headers = exchange.getRequestHeaders(); // Get the headers
@@ -76,45 +73,27 @@ public class UcfServer implements HttpHandler {
 				+ " Computed Digest: " + outDigest);
 
 		if (!(outDigest.equals(inDigest))) { // If they're not equal, complain
-
 			sendError(exchange, "Invalid digest: " + inDigest, HttpURLConnection.HTTP_UNAUTHORIZED);
 			return;
-
 		}
 
 		for (String line : buffer) { // Parse each line from the server
-
 			try {
 
-				JSONObject json = new JSONObject(line); // Create a new object
-														// for each line
-
+				JSONObject json = new JSONObject(line); // Create a new object for each line
 				String user = json.getString("user"); // Init vars
 				String message = json.getString("message");
-				int type = json.getInt("type");
-
-				switch (type) { // Switch for message types
-				case 0:
-					bot.error(message);
-					break;
-				case 1:
-					bot.say(user, message);
-					break;
-				case 2:
-					bot.channel(user, message);
-					break;
-				case 3:
-					bot.action(user, message);
-					break;
-				default:
-					logger.debug("Invalid message type: " + type);
-					break;
+				try {
+					int typeInt = json.getInt("type");
+					Message.Type type = Message.Type.fromInt(typeInt);
+					Message msg = new Message(user, message, this, type);
+					bot.handleMessage(msg);
+				} catch(ArrayIndexOutOfBoundsException e) {
+					logger.debug("Invalid message type: " + e);
 				}
-
 			} catch (JSONException e) {
 				logger.debug("Unable to parse line from server: " + line);
 			}
-
 		}
 
 		exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0); // Wrap it up

@@ -282,35 +282,4 @@ public abstract class Common {
 
 	}
 
-	/**
-	 * Gets the command (the first word) for a given message
-	 * 
-	 * @param message
-	 *            The message to extract the command from
-	 */
-	public static String getCommand(String message) {
-
-		return message.split(" ", 2)[0];
-
-	}
-
-	/**
-	 * Gets the message sans the command
-	 * 
-	 * @param message
-	 *            The message
-	 * @return
-	 */
-	public static String getMessage(String message) {
-
-		return message.split(" ", 2)[1];
-
-	}
-
-	public static String getRandomElement(String[] array) {
-
-		return array[(int) (Math.random() * array.length)];
-
-	}
-
 }

@@ -40,67 +40,6 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler {
 	}
 
 	/**
-	 * Handles an error, and sends it to the server
-	 * 
-	 * @param error
-	 *            The error to send
-	 * @see UcfBot#error(java.lang.String) error
-	 */
-	public void handleError(String error) {
-
-		String user = "admin";
-		String message = error;
-		int type = Common.ERROR;
-		addMessage(user, message, type);
-
-	}
-
-	/**
-	 * Handles a message, and sends it to the server
-	 * 
-	 * @param user
-	 *            The user the message is from
-	 * @param message
-	 *            The message to send
-	 * @see UcfBot#say(java.lang.String, java.lang.String) say
-	 */
-	public void handleSay(String user, String message) {
-
-		int type = Common.SAY;
-		addMessage(user, message, type);
-
-	}
-
-	/**
-	 * Handles an channel event and sends it to the server
-	 * 
-	 * @param user
-	 *            The user the event applies to
-	 * @param message
-	 *            The message describing the user
-	 * @see UcfBot#channel(java.lang.String, java.lang.String)
-	 */
-	public void handleChannel(String user, String message) {
-
-		int type = Common.CHANNEL;
-		addMessage(user, message, type);
-
-	}
-
-	/**
-	 *
-	 * @param user
-	 * @param message
-	 * @see UcfBot#action(java.lang.String, java.lang.String) action
-	 */
-	public void handleAction(String user, String message) {
-
-		int type = Common.ACTION;
-		addMessage(user, message, type);
-
-	}
-
-	/**
 	 * Adds a new message to the queue
 	 * 
 	 * @param user
@@ -110,17 +49,22 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler {
 	 * @param type
 	 *            The type of message
 	 */
-	private void addMessage(String user, String message, int type) {
+	public void handleMessage(Message msg) {
 
+		// Don't send back messages
+		if(msg.src.getClass() == UcfServer.class) {
+			return;
+		}
+		
 		long time = System.currentTimeMillis();
 		JSONObject object = new JSONObject();
 
 		try {
 
 			object.put("time", time);
-			object.put("user", Common.escape(user));
-			object.put("message", Common.escape(message));
-			object.put("type", type);
+			object.put("user", Common.escape(msg.usr));
+			object.put("message", Common.escape(msg.txt));
+			object.put("type", msg.type.value);
 
 			synchronized (lock) {
 				queue.add(object.toString());

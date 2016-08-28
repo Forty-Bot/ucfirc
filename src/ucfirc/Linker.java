@@ -16,12 +16,13 @@ import java.util.Properties;
  * 
  * @author sean
  */
-public class Linker extends Module {
+public class Linker implements MessageHandler {
 
 	static final Logger logger = Logger.getLogger(Linker.class.getCanonicalName());
 	static final String PROPERTY = "link";
 	static final char SEPARATOR = '\u001D';
 	Properties links;
+	private UcfBot bot;
 
 	/**
 	 *
@@ -29,7 +30,7 @@ public class Linker extends Module {
 	 */
 	public Linker(UcfBot bot) {
 
-		super(bot);
+		this.bot = bot;
 		links = new Properties();
 		try {
 			links.load(Common.getInputStreamFromProperty(PROPERTY));
@@ -69,28 +70,31 @@ public class Linker extends Module {
 	}
 
 	@Override
-	public void handleSay(String user, String message) {
+	public void handleMessage(Message msg) {
 
-		message = message.toLowerCase();
-		logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
+		if(msg.type != Message.Type.SAY) {
+			return;
+		}
 
-		if (message.charAt(0) == Common.PREFIX) { // It's for me!
+		String txt = msg.txt.toLowerCase();
+		logger.trace("Handling message \"" + txt + "\" from \"" + msg.usr + "\"");
 
-			String mess = message.substring(1);
+		if (txt.charAt(0) == Common.PREFIX) { // It's for me!
 
-			if (Common.getCommand(mess).equals("link")) {
+			txt = txt.substring(1);
+			String[] parts = txt.split(" ", 3);
 
-				if (!bot.isMod(user))
+			if (parts[0].equals("link")) {
+				if (!bot.isMod(msg.usr)) {
 					return;
-				String keyword = Common.getCommand(Common.getMessage(mess));
-				String response = Common.getMessage(Common.getMessage(mess));
-				setLink(keyword, response);
-
+				}
+				setLink(parts[1], parts[2]);
 			} else {
-
-				if (!getLink(Common.getCommand(mess)).equals(""))
-					say(this.toString(), getLink(Common.getCommand(mess)));
-
+				String link = getLink(parts[0]); 
+				if (!link.equals("")) {
+					Message msg2 = new Message(this.toString(), link, this, Message.Type.SAY);
+					bot.handleMessage(msg2);
+				}
 			}
 		}
 
@@ -99,7 +103,7 @@ public class Linker extends Module {
 	@Override
 	public String toString() {
 
-		return "KarmaBot";
+		return "LinkBot";
 
 	}
 

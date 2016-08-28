@@ -63,10 +63,8 @@ public abstract class Main {
 	 */
 	public static void main(String[] args) {
 
-		logger.info(Common.SALT);
-		ArrayList<Module> handlers = new ArrayList<Module>();
-		MessageHandler messageHandler = new NullMessageHandler();
-		UcfBot bot = new UcfBot(properties, handlers, messageHandler);
+		ArrayList<MessageHandler> handlers = new ArrayList<MessageHandler>();
+		UcfBot bot = new UcfBot(properties, handlers);
 		Incrementer inc = new Incrementer(bot);
 		Linker link = new Linker(bot);
 		handlers.add(inc);
