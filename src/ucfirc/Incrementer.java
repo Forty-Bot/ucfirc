@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ucfirc;
 
 import java.io.IOException;
@@ -17,24 +12,25 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 /**
- * Incrementer module
- * (x++ and such) use !karma &ltkeyword&gt
+ * Incrementer module (x++ and such) use !karma &ltkeyword&gt
+ * 
  * @author sean
  */
 public class Incrementer extends Module {
-    
-    
-    Properties increments;
-    static final Logger logger = Logger.getLogger(Incrementer.class.getCanonicalName());
-    static final String PROPERTY = "increment";
-    boolean forwardIncoming = true;
-    
-    /**
-     * Creates a new incrementer
-     * @param bot The bot to attatch to
-     */
-    public Incrementer(UcfBot bot) {
-	
+
+	Properties increments;
+	static final Logger logger = Logger.getLogger(Incrementer.class.getCanonicalName());
+	static final String PROPERTY = "increment";
+	boolean forwardIncoming = true;
+
+	/**
+	 * Creates a new incrementer
+	 * 
+	 * @param bot
+	 *            The bot to attatch to
+	 */
+	public Incrementer(UcfBot bot) {
+
 		super(bot);
 		increments = new Properties();
 		try {
@@ -43,14 +39,16 @@ public class Incrementer extends Module {
 			logger.fatal("Could not load increments file");
 			throw new Error(e);
 		}
-		
-    }
 
-    /**
-     * Increments a string
-     * @param incrementee The keyword to increment
-     */
-    public void increment(String incrementee) {
+	}
+
+	/**
+	 * Increments a string
+	 * 
+	 * @param incrementee
+	 *            The keyword to increment
+	 */
+	public void increment(String incrementee) {
 
 		increments.setProperty(incrementee, Integer.toString(getKarma(incrementee) + 1));
 		logger.trace("Incremented " + incrementee);
@@ -60,46 +58,47 @@ public class Incrementer extends Module {
 			logger.error("Could not store to increments file");
 		}
 
-    }
+	}
 
-    /**
-     * Returns the karma of a keyword
-     * @param value The keyword to get the karma of
-     * @return The karma of the keyword
-     */
-    public int getKarma(String value) {
+	/**
+	 * Returns the karma of a keyword
+	 * 
+	 * @param value
+	 *            The keyword to get the karma of
+	 * @return The karma of the keyword
+	 */
+	public int getKarma(String value) {
 
 		return Integer.decode(increments.getProperty(value, "0"));
 
-    }
+	}
 
-    @Override
-    public void handleSay(String user, String message) {
+	@Override
+	public void handleSay(String user, String message) {
 
 		message = message.toLowerCase();
 		logger.trace("Handling message \"" + message + "\" from \"" + user + "\"");
-		
+
 		// If the command is karma
-		if(message.charAt(0) == Common.PREFIX && Common.getCommand(message).equals("karma")) {
-				logger.info("Returning the karma of " + message.substring(1));		
-				say("IncBot", user + ": " + Integer.toString(getKarma(Common.getMessage(message))));
+		if (message.charAt(0) == Common.PREFIX && Common.getCommand(message).equals("karma")) {
+			logger.info("Returning the karma of " + message.substring(1));
+			say("IncBot", user + ": " + Integer.toString(getKarma(Common.getMessage(message))));
 		}
 
 		// Otherwise, search it for ++s
 		// match non-whitespace, look ahead for the last instance of ++
 		Matcher m = Pattern.compile("\\S+(?=\\+\\+)").matcher(message);
-		while(m.find()) {
-			String keyword = m.group();
-			increment(keyword.substring(0, keyword.length() - 2));
+		while (m.find()) {
+			increment(m.group());
 		}
 
 	}
 
-    @Override
-    public String toString() {
+	@Override
+	public String toString() {
 
 		return "IncBot";
 
-    }
+	}
 
 }
