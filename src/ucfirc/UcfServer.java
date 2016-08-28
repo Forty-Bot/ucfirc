@@ -44,25 +44,16 @@ public class UcfServer implements HttpHandler {
 
 		logger.trace("Recieved request from " + exchange.getRemoteAddress().getHostName());
 
-		if (!(exchange.getRequestMethod().equals("POST"))) { // If the request
-																// was not post,
-																// return an
-																// error
+		if (!(exchange.getRequestMethod().equals("POST"))) { // If the request was not post, return an error
 
-			sendError(exchange, "Bad method: " + exchange.getRequestMethod(), HttpURLConnection.HTTP_BAD_METHOD);
+			sendError(exchange, "Bad method: " + exchange.getRequestMethod(), 
+			          HttpURLConnection.HTTP_BAD_METHOD);
 			return;
 
 		}
 
-		BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody())); // Create
-																									// a
-																									// new
-																									// buferedreader
-																									// that
-																									// updates
-																									// the
-																									// MessageDigest
-
+		// Create a new buferedreader that updates the MessageDigest	
+		BufferedReader body = new BufferedReader(new InputStreamReader(exchange.getRequestBody())); 
 		LinkedList<String> buffer = new LinkedList<String>(); // Read the lines
 																// into a buffer
 		for (String line = body.readLine(); line != null; line = body.readLine()) {
@@ -126,8 +117,7 @@ public class UcfServer implements HttpHandler {
 
 		}
 
-		exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0); // Wrap it
-																	// up
+		exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0); // Wrap it up
 		exchange.close();
 
 	}

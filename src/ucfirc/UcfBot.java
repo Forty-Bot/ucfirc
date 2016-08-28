@@ -22,31 +22,8 @@ import java.util.Properties;
  */
 public class UcfBot extends PircBot {
 
-	private boolean reconnect = true;
 	static final Logger logger = Logger.getLogger(UcfBot.class.getCanonicalName());
-	private ArrayList<Module> modules;
-	private MessageHandler messageHandler;
-
-	// This is all to play with 2072's mind (and it's also good for 'reducing'
-	// code size)
-
-	public static final String[] joins = {
-
-			"has joined the channel"
-
-	};
-
-	public static final String[] parts = {
-
-			"has left the channel"
-
-	};
-
-	public static final String[] changes = {
-
-			"has changed their name to"
-
-	};
+	private ArrayList<MessageHandler> handlers;
 
 	private String server;
 	private int port;
@@ -61,12 +38,10 @@ public class UcfBot extends PircBot {
 	 * Creates a new IRC Bot
 	 * 
 	 * @param properties
-	 *            The Properties class to use when initializing the bot
+	 *            The Properties object to use when initializing the bot
 	 * @param modules
-	 * @param handler
-	 *            The messageHandler to use when we get a message
 	 */
-	public UcfBot(Properties properties, ArrayList<Module> modules, MessageHandler handler) {
+	public UcfBot(Properties properties, ArrayList<MessageHandler> handlers) {
 
 		setName(properties.getProperty("nick"));
 		server = properties.getProperty("server");
@@ -78,8 +53,7 @@ public class UcfBot extends PircBot {
 		kickDelay = Long.parseLong(properties.getProperty("kickDelay"));
 		version = properties.getProperty("version");
 
-		this.modules = modules;
-		messageHandler = handler;
+		this.handlers = handlers;
 
 		setVersion("Ucf Irc Chatbot " + version + " casiocalc.org");
 		setLogin("UcfIrc");
@@ -99,8 +73,6 @@ public class UcfBot extends PircBot {
 	 */
 	public void chatReconnect() {
 
-		if (!(reconnect))
-			return; // Don't reconnect if reconnect is false
 		logger.debug("(Re)connecting to " + server);
 		chatConnect(server, port, password);
 
@@ -227,10 +199,21 @@ public class UcfBot extends PircBot {
 	 */
 	private void sendMessage(String message) {
 
-		if (!(isConnected()))
-			chatReconnect(); // If we aren't connected, reconnect
-		if (!(Common.hasString(getChannels(), talkChannel)))
-			joinChannel(talkChannel); // If we aren't in the channel, join it
+		if (!(isConnected())) { // If we aren't connected, reconnect
+			chatReconnect();
+		}
+		
+		boolean inChannel = false; // If we aren't in the channel, join it
+		for (String e: getChannels()) {
+			if (e.equals(talkChannel)) {
+				inChannel = true;
+				break;
+			}
+		}
+		if(!inChannel) {	
+			joinChannel(talkChannel);
+		}
+		
 		sendMessage(talkChannel, message);
 
 	}
@@ -264,9 +247,9 @@ public class UcfBot extends PircBot {
 
 		logger.trace(">>> [" + user + "] " + message);
 		sendMessage("[" + user + "] " + message);
-		for (MessageHandler handler : modules) {
-			handler.handleSay(user, message);
+		for (MessageHandler handler : handlers) {
 			logger.debug("Sent message to " + handler);
+			handler.handleSay(user, message);
 		}
 
 	}
@@ -283,8 +266,8 @@ public class UcfBot extends PircBot {
 	 * 
 	 * <pre>
 	 * *user entered the channel
-	* *user created a new topic [Topic Name] http://casiocalc.org/topic
-	* *user was kicked by kicker: reason
+	 * *user created a new topic [Topic Name] http://casiocalc.org/topic
+	 * *user was kicked by kicker: reason
 	 * </pre>
 	 * 
 	 * @param user
@@ -296,8 +279,9 @@ public class UcfBot extends PircBot {
 
 		logger.trace(">>> *" + user + " " + message);
 		sendMessage("*" + user + " " + message);
-		for (MessageHandler handler : modules)
+		for (MessageHandler handler : handlers) {
 			handler.handleChannel(user, message);
+		}
 
 	}
 
@@ -343,7 +327,6 @@ public class UcfBot extends PircBot {
 
 		if (!(isConnected()))
 			return;
-		reconnect = false;
 		quitServer("Someone pulled the plug!");
 		super.finalize();
 
@@ -374,8 +357,7 @@ public class UcfBot extends PircBot {
 		if (sender.equals(getName()))
 			return;
 
-		String message = Common.getRandomElement(joins);
-
+		String message = "has joined the chat";
 		channelModules(sender, message);
 		messageHandler.handleChannel(sender, message);
 		logger.trace(">>> *" + sender + " " + message);
@@ -390,8 +372,7 @@ public class UcfBot extends PircBot {
 		if (sender.equals(getName()))
 			return;
 
-		String message = Common.getRandomElement(parts);
-
+		String message = "has left the chat";
 		channelModules(sender, message);
 		messageHandler.handleChannel(sender, message);
 		logger.trace(">>> *" + sender + " " + message);
@@ -417,8 +398,7 @@ public class UcfBot extends PircBot {
 		if (sourceNick.equals(getName()))
 			return;
 
-		String message = Common.getRandomElement(parts);
-
+		String message = "has left the chat";
 		channelModules(sourceNick, message);
 		messageHandler.handleChannel(sourceNick, message);
 		logger.trace(">>> *" + sourceNick + " " + message);
@@ -431,12 +411,10 @@ public class UcfBot extends PircBot {
 		if (newNick.equals(getName()))
 			return;
 
-		String message = Common.getRandomElement(changes);
-		logger.fatal(message);
-
-		channelModules(oldNick, message + " " + newNick);
-		messageHandler.handleChannel(oldNick, message + " " + newNick);
-		logger.trace(">>> *" + oldNick + " " + message + " " + newNick);
+		String message = "has changed thir name to "
+		channelModules(oldNick, message + newNick);
+		messageHandler.handleChannel(oldNick, message + newNick);
+		logger.trace(">>> *" + oldNick + " " + message + newNick);
 
 	}
 

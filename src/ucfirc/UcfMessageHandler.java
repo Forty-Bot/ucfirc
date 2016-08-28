@@ -144,17 +144,13 @@ public class UcfMessageHandler extends TimerTask implements MessageHandler {
 		if (queue.isEmpty())
 			return; // Don't even bother if the queue is empty
 		logger.debug("Flushing messages");
-		synchronized (lock) { // Make sure no one else touches the queue while
-								// we're using it
+		synchronized (lock) { // Make sure no one else touches the queue while we're using it
 
 			String messageDigest = Common.getHash(queue); // Get digest in hex
 			String random = Common.randomString();
 			String key = random + Common.SALT + messageDigest;
-			String outDigest = Common.toHex(Common.getMessageDigest().digest(key.getBytes())); // Compute
-																								// the
-																								// digest
-																								// to
-																								// send
+			// Compute the digest to send
+			String outDigest = Common.toHex(Common.getMessageDigest().digest(key.getBytes())); 
 			HttpURLConnection connection;
 
 			try {

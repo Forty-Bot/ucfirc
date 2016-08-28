@@ -70,24 +70,6 @@ public abstract class Common {
 	static final char PREFIX = Main.properties.getProperty("prefix").charAt(0);
 
 	/**
-	 * Utility method that checks to see if an array has a string.
-	 * 
-	 * @param array
-	 *            The array to search
-	 * @param string
-	 *            The string to find
-	 * @return Whether it was found
-	 */
-	public static boolean hasString(String[] array, String string) {
-
-		for (String stringA : array)
-			if (stringA.equals(string))
-				return true;
-		return false;
-
-	}
-
-	/**
 	 * Utility method that takes an array of bytes, and outputs a string that
 	 * represents their hex value
 	 * 
@@ -115,12 +97,11 @@ public abstract class Common {
 		if (pdigest == null) {
 
 			try {
-				pdigest = MessageDigest.getInstance("SHA-1"); // Fetch a message
-																// digest
+				pdigest = MessageDigest.getInstance("SHA-1"); // Fetch a message digest
 				return pdigest;
 			} catch (NoSuchAlgorithmException e) {
 				LOGGER.fatal("FATAL ERROR: Unable to load the algorithm \"SHA-1\"");
-				throw new Error("Unable to load the algorithm \"sha-1\"", e);
+				throw new Error(e);
 			}
 		} else {
 
@@ -281,7 +262,7 @@ public abstract class Common {
 		} catch (FileNotFoundException e) {
 			LOGGER.fatal("Unable to find file for the property \"" + property + "\" with the value of \""
 					+ Main.properties.getProperty(property) + ": " + e.getMessage());
-			return null;
+			throw new Error(e);
 		}
 
 	}
@@ -296,7 +277,7 @@ public abstract class Common {
 		} catch (FileNotFoundException e) {
 			LOGGER.fatal("Unable to find file for the property \"" + property + "\" with the value of \""
 					+ Main.properties.getProperty(property) + ": " + e.getMessage());
-			return null;
+			throw new Error(e);
 		}
 
 	}

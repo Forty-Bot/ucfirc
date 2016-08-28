@@ -22,7 +22,6 @@ public class Linker extends Module {
 	static final String PROPERTY = "link";
 	static final char SEPARATOR = '\u001D';
 	Properties links;
-	boolean forwardIncoming = true;
 
 	/**
 	 *

@@ -71,7 +71,6 @@ public abstract class Main {
 		Linker link = new Linker(bot);
 		handlers.add(inc);
 		handlers.add(link);
-		bot.setModules(handlers); // This might not be necessary
 		bot.chatReconnect();
 
 		// Timer timer = new Timer();

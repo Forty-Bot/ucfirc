@@ -2,8 +2,6 @@ package ucfirc;
 
 public class NullMessageHandler implements MessageHandler {
 
-	boolean forwardIncoming = false;
-
 	public void handleError(String error) {
 	}
 

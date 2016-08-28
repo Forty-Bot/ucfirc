@@ -12,11 +12,6 @@ package ucfirc;
  */
 public class Module implements MessageHandler {
 
-	/**
-	 * Forward incoming messages (from server)
-	 */
-	public static final boolean forwardIncoming = false;
-
 	UcfBot bot;
 
 	/**

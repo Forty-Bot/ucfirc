@@ -21,7 +21,6 @@ public class Incrementer extends Module {
 	Properties increments;
 	static final Logger logger = Logger.getLogger(Incrementer.class.getCanonicalName());
 	static final String PROPERTY = "increment";
-	boolean forwardIncoming = true;
 
 	/**
 	 * Creates a new incrementer
